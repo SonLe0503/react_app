@@ -4,16 +4,29 @@ import { DownOutlined, SearchOutlined } from "@ant-design/icons";
 
 import { Button, Form, Modal, Input, Avatar } from "antd";
 
-import { collection, onSnapshot, updateDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  updateDoc,
+  doc,
+  query,
+} from "firebase/firestore";
 
 import { useEffect, useState } from "react";
 
 import { db } from "../../firebase";
-function AddFriend({ isModalFriend, setIsModalFriend, selectedRoom }) {
+function AddFriend({
+  isModalFriend,
+  setIsModalFriend,
+  selectedRoom,
+}) {
   const [searchIcon, setSearchIcon] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
-
+  const [users, setUsers] = useState([]);
+  const filteredUsers = users.filter((user) =>
+    user.displayName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
   function handlesearchIcon() {
     setSearchIcon(!searchIcon);
   }
@@ -22,12 +35,13 @@ function AddFriend({ isModalFriend, setIsModalFriend, selectedRoom }) {
       setSearchIcon(false);
     }
   }
-  const handleOk = async() => {
-    if(selectedUser){
-      const roomRef = doc(db, "rooms", selectedRoom );
+  const handleOk = async () => {
+    if (selectedUser) {
+      console.log(selectedRoom);
+      const roomRef = doc(db, "rooms", selectedRoom.id);
       await updateDoc(roomRef, {
-        members: [...selectedUser.members, selectedUser.id],
-      })
+        members: [...selectedRoom.members, selectedUser.uid],
+      });
       handleCancel();
     }
   };
@@ -36,22 +50,25 @@ function AddFriend({ isModalFriend, setIsModalFriend, selectedRoom }) {
     setIsModalFriend(false);
     setSelectedUser(null);
     form.resetFields();
-    setSearchQuery("")
+    setSearchQuery("");
   };
-  const [users, setUsers] = useState([]);
+
   useEffect(() => {
-    const result = onSnapshot(collection(db, "users"), (snapshot) => {
-      const usersData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+    if (!selectedRoom) return;
+    const userQuery = query(collection(db, "users"));
+    const result = onSnapshot(userQuery, (snapshot) => {
+      const usersData = snapshot.docs
+        .map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        .filter((elm) => {
+          return !selectedRoom?.members.includes(elm.uid);
+        });
       setUsers(usersData);
     });
     return () => result();
-  }, []);
-  const filteredUsers = users.filter((user) =>
-    user.displayName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  }, [selectedRoom]);
   const handleSearchChange = (e) => {
     if (!selectedUser) {
       setSearchQuery(e.target.value);
@@ -77,48 +94,48 @@ function AddFriend({ isModalFriend, setIsModalFriend, selectedRoom }) {
           onClick={handleForm}
           form={form}
         >
-          <Form.Item
-            name="nameMembers"
-          >
-            <Input
-              placeholder="Enter names of the members"
-              suffix={searchIcon ? <SearchOutlined /> : <DownOutlined />}
-              onClick={handlesearchIcon}
-              value={searchQuery}
-              onChange={handleSearchChange}
-              addonBefore={
-                selectedUser && (
-                  <>
-                    <Avatar
-                      style={{ width: "25px, height:25px" }}
-                      src={selectedUser.photoURL}
-                    ></Avatar>
-                    <span>{selectedUser.displayName}</span>
-                  </>
-                )
-              }
-            />
-            {searchQuery && !selectedUser && (
-            <ul>
-              {filteredUsers.map((user) => (
-                <div key={user.uid} onClick={() => handleChooseUser(user)}>
-                  {user.photoURL && (
-                    <Avatar
-                      style={{
-                        width: "25px",
-                        height: "25px",
-                        marginRight: "10px",
-                      }}
-                      src={user.photoURL}
-                    ></Avatar>
-                  )}
-                  <span>{user.displayName}</span>
-                </div>
-              ))}
-            </ul>
-          )}
+          <Form.Item name="nameMembers">
+            <div>
+              <Input
+                placeholder="Enter names of the members"
+                suffix={searchIcon ? <SearchOutlined /> : <DownOutlined />}
+                onClick={handlesearchIcon}
+                value={searchQuery}
+                onChange={handleSearchChange}
+                addonBefore={
+                  selectedUser && (
+                    <>
+                      <Avatar
+                        style={{ width: "25px, height:25px" }}
+                        src={selectedUser.photoURL}
+                      ></Avatar>
+                      <span>{selectedUser.displayName}</span>
+                    </>
+                  )
+                }
+              />
+              {searchQuery && !selectedUser && (
+                <ul>
+                  {filteredUsers.map((user) => (
+                    <div key={user.uid} onClick={() => handleChooseUser(user)}>
+                      {user.photoURL && (
+                        <Avatar
+                          style={{
+                            width: "25px",
+                            height: "25px",
+                            marginRight: "10px",
+                          }}
+                          src={user.photoURL}
+                        ></Avatar>
+                      )}
+                      <span>{user.displayName}</span>
+                    </div>
+                  ))}
+                </ul>
+              )}
+            </div>
           </Form.Item>
-          
+
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
               type="default"

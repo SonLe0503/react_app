@@ -1,7 +1,13 @@
 /* eslint-disable react/prop-types */
 import { Modal, Button, Form, Input } from "antd";
 
-import { addDoc, arrayUnion, collection, updateDoc, doc } from "firebase/firestore";
+import {
+  addDoc,
+  arrayUnion,
+  collection,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 
 import { db } from "../../firebase";
 function AddRoom({ isModalVisible, setIsModalVisible, infoUser }) {
@@ -27,8 +33,8 @@ function AddRoom({ isModalVisible, setIsModalVisible, infoUser }) {
     });
     console.log("Document written with ID:", room.id);
     const roomId = room.id;
-    await updateDoc(doc(db, "rooms", roomId),{
-      members: arrayUnion(infoUser.uid)
+    await updateDoc(doc(db, "rooms", roomId), {
+      members: arrayUnion(infoUser.uid),
     });
   };
   const handleCancel = () => {

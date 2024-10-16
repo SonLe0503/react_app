@@ -14,9 +14,19 @@ import { signOut } from "firebase/auth";
 
 import Panel from "antd/es/splitter/Panel";
 
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+  getDoc,
+  doc,
+  getDocs,
+} from "firebase/firestore";
 
 import EmojiPicker from "emoji-picker-react";
+
+import { addDoc } from "firebase/firestore/lite";
 
 import { auth, db } from "../../firebase";
 
@@ -54,6 +64,7 @@ function Chat() {
   });
   const [rooms, setRooms] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState("");
+  const [selectedRoom, setSelectedRoom] = useState("");
   const handleShowModal = () => {
     setIsModalVisible(!isModalVisible);
   };
@@ -77,9 +88,10 @@ function Chat() {
     });
   }, []);
   const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
+  const [usersData, setUsersData] = useState([]);
   useEffect(() => {
     if (currentUserId) {
-      const result = onSnapshot(collection(db, "rooms"), (snapshot) => {
+      const result = onSnapshot(collection(db, "rooms"), async (snapshot) => {
         const roomsData = snapshot.docs
           .map((doc) => ({
             id: doc.id,
@@ -88,13 +100,28 @@ function Chat() {
           .filter(
             (room) => room.members && room.members.includes(currentUserId)
           );
+        const memberUids = roomsData.flatMap((room) => room.members);
+        const q = query(
+          collection(db, "users"),
+          where("uid", "in", memberUids)
+        );
+        const querySnapshot = await getDocs(q);
+        let usersData = [];
+        usersData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        if (selectedRoom) {
+          usersData = usersData.filter((elm) =>
+            selectedRoom.members.includes(elm.uid)
+          );
+        }
+        setUsersData(usersData);
         setRooms(roomsData);
       });
       return () => result();
     }
-  }, [currentUserId]);
-
-  console.log(isShowAdd);
+  }, [currentUserId, selectedRoom]);
 
   const handleLogOut = () => {
     signOut(auth)
@@ -103,7 +130,7 @@ function Chat() {
         console.log(error);
       });
   };
-  const [selectedRoom, setSelectedRoom] = useState("");
+
   const handleShowMess = (room) => {
     setSelectedRoom(room);
   };
@@ -113,8 +140,36 @@ function Chat() {
   };
   const [showEmoji, setShowEmoji] = useState("");
   const handleShowEmoji = () => {
-    setShowEmoji(!showEmoji);
+    setShowEmoji((prev) => !prev);
   };
+  const [inputValue, setInputValue] = useState("");
+  const handleEmojiClick = (emojiObject) => {
+    setInputValue((prev) => prev + emojiObject.emoji);
+  };
+  const handleSend = async () => {
+    if (infoUser) {
+      if (inputValue.trim() === "") return;
+      console.log(collection(db, "messages"));
+      try {
+        const message = await addDoc(collection(db, "messages"), {
+          createAt: new Date(),
+          text: inputValue,
+          displayName: infoUser.displayName,
+          photoURL: infoUser.photoURL,
+          roomId: selectedRoom.id,
+          uid: infoUser.uid,
+        });
+        console.log("Document written with ID: ", message.id);
+      } catch (error) {
+        console.log("====================================");
+        console.log(error);
+        console.log("====================================");
+      }
+
+      setInputValue("");
+    }
+  };
+  console.log(infoUser);
   return (
     <>
       <ChatContainer>
@@ -258,12 +313,23 @@ function Chat() {
                     >
                       Mời
                     </Button>
-                    <Avatar src={infoUser.photoURL}></Avatar>
+                    {usersData.map((user) => (
+                      <Avatar key={user.id} src={user.photoURL} />
+                    ))}
                   </div>
                 </div>
               </div>
               <div className="body" style={{ flex: "1" }}>
-                <div className="body-message"></div>
+                <div className="body-message">
+                  <div>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                  <div>
+                    <span></span>
+                  </div>
+                </div>
               </div>
               <div
                 className="footer"
@@ -291,6 +357,8 @@ function Chat() {
                         color: "#fff",
                       }}
                       placeholder="Type a message...."
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
                     ></Input>
                     <Button
                       onClick={handleShowEmoji}
@@ -305,9 +373,15 @@ function Chat() {
                         right: "10px",
                       }}
                     >
-                      {showEmoji && <div>{<EmojiPicker />}</div>}
+                      {showEmoji && (
+                        <div>
+                          {<EmojiPicker onEmojiClick={handleEmojiClick} />}
+                        </div>
+                      )}
                     </div>
-                    <Button type="primary">Send</Button>
+                    <Button type="primary" onClick={handleSend}>
+                      Send
+                    </Button>
                   </div>
                 </div>
               </div>
