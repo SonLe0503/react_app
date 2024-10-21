@@ -102,7 +102,6 @@ function Chat() {
     });
   }, []);
   const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
-  console.log(currentUserId);
   const [usersData, setUsersData] = useState([]);
   useEffect(() => {
     if (currentUserId) {
@@ -145,7 +144,6 @@ function Chat() {
         console.log(error);
       });
   };
-
   const handleShowMess = (room) => {
     setSelectedRoom(room);
   };
@@ -243,20 +241,76 @@ function Chat() {
       if (user) {
         setUpPresence(user.uid);
       } else {
-        if (auth.currentUser) {
+        const currentUser = auth.currentUser;
+        if (currentUser) {
           const userStatusDatabaseRef = ref(
             database,
-            `/status/${auth.currentUser.uid}`
+            `/status/${currentUser.uid}`
           );
           set(userStatusDatabaseRef, {
             state: "offline",
             last_changed: serverTimestamp(),
-          });
+          })
+            .then(() => {
+              console.log("User is offline");
+            })
+            .catch((error) => {
+              console.error("Error updating status to offline: ", error);
+            });
         }
       }
     });
-    return () => unsubscribe();
-  }, [auth]);
+    const handleBeforeUnload = (event) => {
+      const userStatusDatabaseRef = ref(
+        database,
+        `/status/${auth.currentUser.uid}`
+      );
+      set(userStatusDatabaseRef, {
+        state: "offline",
+        last_changed: serverTimestamp(),
+      });
+    };
+
+    // Hàm xử lý khi cửa sổ mất focus
+    const handleBlur = () => {
+      const userStatusDatabaseRef = ref(
+        database,
+        `/status/${auth.currentUser.uid}`
+      );
+      set(userStatusDatabaseRef, {
+        state: "away",
+        last_changed: serverTimestamp(),
+      });
+    };
+
+    // Hàm theo dõi hoạt động của người dùng
+    const handleUserActivity = () => {
+      const userStatusDatabaseRef = ref(
+        database,
+        `/status/${auth.currentUser.uid}`
+      );
+      set(userStatusDatabaseRef, {
+        state: "online",
+        last_changed: serverTimestamp(),
+      });
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("blur", handleBlur);
+    window.addEventListener("mousemove", handleUserActivity);
+    window.addEventListener("mousedown", handleUserActivity);
+    window.addEventListener("keydown", handleUserActivity);
+    window.addEventListener("touchstart", handleUserActivity);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("mousemove", handleUserActivity);
+      window.removeEventListener("mousedown", handleUserActivity);
+      window.removeEventListener("keydown", handleUserActivity);
+      window.removeEventListener("touchstart", handleUserActivity);
+    };
+  }, [auth, database]);
   const setUpPresence = (userId) => {
     const userStatusDatabaseRef = ref(database, `/status/${userId}`);
     const connectedRef = ref(database, ".info/connected");
@@ -276,21 +330,51 @@ function Chat() {
     });
   };
   const [userState, setUserState] = useState("offline");
-  console.log(userState)
+  const handleOfflineDuration = (lastChangedTime) => {
+    const currentTime = new Date().getTime();
+    const timeDifference = currentTime - lastChangedTime;
+
+    const secondsOffline = Math.floor(timeDifference / 1000);
+    const minutesOffline = Math.floor(secondsOffline / 60);
+    const hoursOffline = Math.floor(minutesOffline / 60);
+    const daysOffline = Math.floor(hoursOffline / 24);
+
+    if (secondsOffline < 60) {
+      return ` - Last seen: a few seconds ago`;
+    } else if (minutesOffline < 60) {
+      return ` - Last seen: ${minutesOffline} minutes ago`;
+    } else if (hoursOffline < 24) {
+      return ` - Last seen: ${hoursOffline} hours ago`;
+    } else {
+      return ` - Last seen: ${daysOffline} days ago`;
+    }
+  };
   useEffect(() => {
     usersData.forEach((user) => {
       const userStatusRef = ref(database, `/status/${user.uid}`);
       const unsubscribe = onValue(userStatusRef, (snapshot) => {
         const statusData = snapshot.val();
         if (statusData) {
+          const currentTime = new Date().getTime();
+          const lastChangedTime = statusData.last_changed
+            ? statusData.last_changed
+            : currentTime;
+
+          let offlineDuration = "";
+          if (statusData.state === "offline") {
+            offlineDuration = handleOfflineDuration(lastChangedTime);
+          }
           setUserState((prevStates) => ({
             ...prevStates,
-            [user.uid]: statusData.state,
+            [user.uid]: {
+              state: statusData.state,
+              offlineDuration: offlineDuration,
+            },
           }));
         }
       });
       return () => unsubscribe();
-    })
+    });
   }, [usersData]);
   return (
     <>
@@ -449,12 +533,18 @@ function Chat() {
                                   borderRadius: "50%",
                                   marginRight: "10px",
                                   backgroundColor:
-                                    userState[user.uid] === "offline"
+                                    userState[user.uid] &&
+                                    userState[user.uid].state === "offline"
                                       ? "transparent"
                                       : "green",
                                 }}
                               ></div>
-                              <span>{user.displayName}</span>
+                              <span>
+                                {user.displayName}{" "}
+                                {userState[user.uid] &&
+                                  userState[user.uid].state === "offline" &&
+                                  userState[user.uid].offlineDuration}
+                              </span>
                             </div>
                           ))}
                         </div>
@@ -483,7 +573,7 @@ function Chat() {
               <div className="header" style={{ width: "100%" }}>
                 <div
                   style={{
-                    padding: "10px",
+                    padding: "15px",
                     borderBottom: "1px solid white",
                     display: "flex",
                     justifyContent: "space-between",
@@ -514,9 +604,11 @@ function Chat() {
                       >
                         Inviite
                       </Button>
-                      {usersData.map((user) => (
-                        <Avatar key={user.id} src={user.photoURL} />
-                      ))}
+                      <Avatar.Group max={2}>
+                        {usersData.map((user) => (
+                          <Avatar key={user.id} src={user.photoURL}></Avatar>
+                        ))}
+                      </Avatar.Group>
                     </div>
                   </div>
                 </div>
@@ -554,7 +646,10 @@ function Chat() {
                             marginBottom: "15px",
                             display: "flex",
                             flexDirection: "column",
-                            alignItems: msg.uid === currentUserId ? "flex-end" : "flex-start",
+                            alignItems:
+                              msg.uid === currentUserId
+                                ? "flex-end"
+                                : "flex-start",
                           }}
                         >
                           <div>
@@ -584,17 +679,23 @@ function Chat() {
                               {timeFormatted}
                             </span>
                           </div>
-                          <div style={{ 
-                            marginTop: "10px", 
-                            width: "70%",
-                            textAlign: msg.uid === currentUserId ? "right" : "left",
-                             }}>
+                          <div
+                            style={{
+                              marginTop: "10px",
+                              width: "70%",
+                              textAlign:
+                                msg.uid === currentUserId ? "right" : "left",
+                            }}
+                          >
                             <span
                               style={{
                                 marginLeft: "35px",
                                 color: "#fff",
                                 fontSize: "14px",
-                                background: "gray",
+                                background:
+                                  msg.uid === currentUserId
+                                    ? "#27A4F2"
+                                    : "gray",
                                 padding: "7px",
                                 borderRadius: "15px",
                                 display: "inline-block",
