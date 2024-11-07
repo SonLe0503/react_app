@@ -4,6 +4,9 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
+  min-width: 500px;
+  max-width: 1500px;
+  flex: 1;
 }
 .chat_container {
   position: relative;
@@ -12,10 +15,11 @@
 }
 .chat_header {
   width: 100%;
+  padding-bottom: 12px;
+  border-bottom: 1px solid white;
 }
 .header {
   padding: 15px;
-  border-bottom: 1px solid white;
   display: flex;
   justify-content: space-between;
   z-index: 10;
@@ -48,6 +52,7 @@
   width: 100%;
   position: absolute;
   bottom: 0;
+
 }
 .chat_listmessage {
   flex: 1;
@@ -55,7 +60,18 @@
   display: flex;
   width: 100%;
   flex-direction: column-reverse;
-  height: calc(100vh - 140px);
+  height: calc(100vh - 146px);
+  align-items: center;
+}
+.chat_listmessage::-webkit-scrollbar{
+  display: none;
+}
+.list_message{
+  max-width: 1000px;
+  display:flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
 }
 .message {
   margin-left: 10px;
@@ -112,12 +128,13 @@
 .footer_send {
   width: 100%;
   margin: 10px;
+  max-width: 1000px;
 }
 .footer_send_mess {
   display: flex;
-  border: 1px solid white;
   border-radius: 15px;
   background-color: rgba(255, 255, 255, 0.5);
+  padding: 10px;
 }
 
 .send_icon {
@@ -133,4 +150,7 @@
   position: absolute;
   bottom: 50px;
   right: 20px;
+}
+.icon_emoji_box{
+  box-sizing: border-box;
 }

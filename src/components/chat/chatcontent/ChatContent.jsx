@@ -1,27 +1,29 @@
-/* eslint-disable react/prop-types */
-
 import { UserAddOutlined } from "@ant-design/icons";
 
 import { Col, Button, Avatar, Input } from "antd";
 
 import { isToday, format, isYesterday, isSameWeek } from "date-fns";
 
+import { useContext } from "react";
+
 import StickerPicker from "../sticker/StickerPicker";
+import { Context } from "../../context/Context";
 
 import "./ChatContent.css";
-function ChatContent({
-  selectedRoom,
-  handleShowModalFriend,
-  usersData,
-  message,
-  currentUserId,
-  inputValue,
-  setInputValue,
-  handleSend,
-  handleShowEmoji,
-  showEmoji,
-  handleSelectedReactIcon,
-}) {
+function ChatContent() {
+  const {
+    selectedRoom,
+    handleShowModalFriend,
+    usersData,
+    message,
+    currentUserId,
+    handleSend,
+    handleShowEmoji,
+    showEmoji,
+    handleSelectedReactIcon,
+    inputValue,
+    setInputValue,
+  } = useContext(Context);
   const isImageUrl = (url) => {
     return (
       typeof url === "string" &&
@@ -52,7 +54,7 @@ function ChatContent({
     <>
       <Col span={18} className="chatcontent">
         {selectedRoom ? (
-          <div className="chat_container">
+          <div className="chatcontent_container">
             <div className="chat_header">
               <div className="header">
                 <div className="header_info">
@@ -70,7 +72,7 @@ function ChatContent({
                     >
                       Inivite
                     </Button>
-                    <Avatar.Group max={2}>
+                    <Avatar.Group max={{ count: 2 }}>
                       {usersData.map((user) => (
                         <Avatar key={user.id} src={user.photoURL}></Avatar>
                       ))}
@@ -166,7 +168,7 @@ function ChatContent({
                     ></img>
                     <div className="icon_emoji">
                       {showEmoji && (
-                        <div>
+                        <div className="icon_emoji_box">
                           {
                             <StickerPicker
                               handleSelectedReactIcon={handleSelectedReactIcon}

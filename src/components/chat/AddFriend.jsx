@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
 
 import { Modal, Avatar, Select } from "antd";
 
@@ -12,10 +10,12 @@ import {
   where,
 } from "firebase/firestore";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { db } from "../../firebase";
-function AddFriend({ isModalFriend, setIsModalFriend, selectedRoom }) {
+import { Context } from "../context/Context";
+function AddFriend() {
+  const {isModalFriend, setIsModalFriend, selectedRoom} = useContext(Context)
   const handleCancel = () => {
     setIsModalFriend(!isModalFriend);
     setSearchQuery("");

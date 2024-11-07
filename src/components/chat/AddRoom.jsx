@@ -9,8 +9,12 @@ import {
   doc,
 } from "firebase/firestore";
 
+import { useContext } from "react";
+
 import { db } from "../../firebase";
-function AddRoom({ isModalVisible, setIsModalVisible, infoUser }) {
+import { Context } from "../context/Context";
+function AddRoom() {
+  const {isModalVisible, setIsModalVisible, infoUser} = useContext(Context);
   const [form] = Form.useForm();
   const onSubmit = () => {
     form

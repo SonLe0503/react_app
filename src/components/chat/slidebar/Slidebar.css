@@ -1,5 +1,7 @@
 .slidebar {
   width: 100%;
+  min-width: 400px;
+  max-width: 420px;
 }
 .slidebar_rooms {
   width: 100%;
@@ -9,17 +11,17 @@
 .slidebar_content {
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+}
+.slidebar_content::-webkit-scrollbar {
+  display: none;
 }
 .slidebar_content_element {
   display: flex;
 }
 .slidebar_content_element_header {
   border-bottom: 1px solid white;
-}
-.header_content {
-  display: flex;
-  justify-content: space-between;
-  padding: 15.5px;
 }
 .content_userName {
   margin: 5px;
@@ -71,10 +73,11 @@
   display: flex;
   width: 100%;
   justify-content: flex-start;
+  box-shadow: none;
+  transition: background-color 0.3s ease;
 }
-.btn_addRoom {
-  background: none;
-  border: none;
+.btn_roomName:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 .list2 {
   margin-top: 20px;
@@ -121,4 +124,49 @@
   height: 10px;
   border-radius: 50%;
   margin-right: 10px;
+}
+.img_menu {
+  height: 40px;
+  width: 40px;
+  border-radius: 20px;
+}
+.img_menu:hover{
+  background-color: #fff;
+}
+.list_notifications {
+  margin-top: 10px;
+}
+.infoUser_notification {
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 3px;
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+}
+.infoUser_notification:hover{
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.infoUser_details {
+  display: flex;
+  align-items: center;
+}
+.btn_notifications{
+  display: flex;
+}
+
+.friends_btn{
+  margin: 10px;
+  border-radius: 10px;
+  padding: 10px;
+}
+.info_friends{
+  display: flex;
+  align-items: center;
+}
+.friends_btn:hover{
+  background-color: rgba(255, 255, 255, 0.2);
 }

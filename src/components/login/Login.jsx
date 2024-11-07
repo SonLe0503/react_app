@@ -1,3 +1,4 @@
+
 import { GoogleOutlined, FacebookOutlined } from "@ant-design/icons";
 
 import { Row, Col, Button } from "antd";
@@ -5,12 +6,12 @@ import { Row, Col, Button } from "antd";
 import styled from "styled-components";
 
 import { getAuth, signInWithPopup, getAdditionalUserInfo } from "firebase/auth";
-
-import { useHistory } from "react-router-dom";
-
 import { addDoc, collection } from "firebase/firestore";
 
+import { useContext } from "react";
+
 import { provider, db } from "../../firebase";
+import {Context} from "../context/Context";
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -26,12 +27,11 @@ const Container = styled.div`
   }
 `;
 function Login() {
-  const history = useHistory();
+  const {history} = useContext(Context);
   const auth = getAuth();
   const handleLogin = () => {
     signInWithPopup(auth, provider)
       .then(async (result) => {
-        console.log(result);
         const detail = getAdditionalUserInfo(result);
         if (detail.isNewUser) {
           const user = await addDoc(collection(db, "users"), {
