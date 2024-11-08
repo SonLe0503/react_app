@@ -31,7 +31,6 @@ function StickerPicker({ handleSelectedReactIcon }) {
   }
 
   useEffect(() => {
-    console.log(activeTab);
     if (activeTab === "Gifs") {
       fetchGifs(searchQuery, 0);
     }
@@ -58,7 +57,6 @@ function StickerPicker({ handleSelectedReactIcon }) {
       console.error("Error fetching GIFs:", error);
     }
   };
-  console.log(gifs);
   const handleScroll = (e) => {
     console.log("scroll");
     const bottom =

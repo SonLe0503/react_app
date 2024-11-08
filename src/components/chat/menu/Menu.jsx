@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
 import {
   UserOutlined,
   AppstoreOutlined,
@@ -10,15 +8,14 @@ import {
 
 import { useContext, } from "react";
 
-import Contact from "../Contact";
 import { Context } from "../../context/Context";
 
 import "./Menu.css";
 function Menu() {
-  const {activeTab, setActiveTab, handleShowModal, handleShowContact} = useContext(Context);
+  const {activeTab, setActiveTab, handleShowModal, handleShowContact,} = useContext(Context);
   return (
     <>
-      <div className="menu_container">
+      <div className="menu_container" >
         <div
           className={`tab1 ${activeTab === "menu_friends" ? "active" : ""}`}
           onClick={() => setActiveTab("menu_friends")}

@@ -24,9 +24,17 @@
   justify-content: space-between;
   z-index: 10;
 }
+.header_avaname{
+  display: flex;
+  align-items: center;
+}
 .info_name {
   color: #fff;
   font-weight: bold;
+}
+.info_name2 {
+  color: #fff;
+  margin-left: 10px;
 }
 .info_des {
   color: #fff;
@@ -52,7 +60,6 @@
   width: 100%;
   position: absolute;
   bottom: 0;
-
 }
 .chat_listmessage {
   flex: 1;
@@ -63,15 +70,15 @@
   height: calc(100vh - 146px);
   align-items: center;
 }
-.chat_listmessage::-webkit-scrollbar{
+.chat_listmessage::-webkit-scrollbar {
   display: none;
 }
-.list_message{
+.list_message {
   max-width: 1000px;
-  display:flex;
+  display: flex;
   flex-direction: column;
   box-sizing: border-box;
-
+  width: 100%;
 }
 .message {
   margin-left: 10px;
@@ -151,6 +158,14 @@
   bottom: 50px;
   right: 20px;
 }
-.icon_emoji_box{
+.icon_emoji_box {
   box-sizing: border-box;
+}
+.p{
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 10px;
+  margin: 10px;
+  text-align: center;
+  border-radius: 20px;
 }

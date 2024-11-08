@@ -1,6 +1,6 @@
 import { Col, Row, Button, Avatar } from "antd";
 
-import { useContext, useState } from "react";
+import { useContext, useState, useRef, useEffect} from "react";
 
 import Menu from "../menu/Menu.jsx";
 import { Context } from "../../context/Context.jsx";
@@ -9,12 +9,32 @@ import AllRooms from "./AllRooms.jsx";
 import Friends from "./Friends.jsx";
 import Notification from "./Notification.jsx";
 import "./Slidebar.css";
+
 function Slidebar() {
-  const { infoUser, activeTab, handleLogOut } = useContext(Context);
+  const { infoUser, activeTab, handleLogOut, } =
+    useContext(Context);
   const [isMenu, setIsMenu] = useState(false);
   const handleMenu = () => {
-    setIsMenu(!isMenu);
+    setIsMenu((prev) => !prev);
   };
+  const showRef = useRef(null);
+  const buttonRef = useRef(null);
+   const handleClickOutside = (event) => {
+    if (
+      showRef.current &&
+      buttonRef.current &&
+      !showRef.current.contains(event.target) &&
+      !buttonRef.current.contains(event.target)
+    ) {
+      setIsMenu(false);
+    }
+  };
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   return (
     <>
       <Col className="slidebar" span={6}>
@@ -40,8 +60,13 @@ function Slidebar() {
                       src="image_menu.png"
                       alt="Menu"
                       onClick={handleMenu}
+                      ref={buttonRef}
                     />
-                    {isMenu && <Menu />}
+                    {isMenu && (
+                      <div ref={showRef}>
+                        <Menu />
+                      </div>
+                    )}
                   </div>
                   <div className="content_user">
                     <Avatar src={infoUser.photoURL}></Avatar>

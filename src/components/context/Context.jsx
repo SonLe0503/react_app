@@ -15,7 +15,6 @@ import {
   query,
   where,
   addDoc,
-  
 } from "firebase/firestore";
 import {
   onDisconnect,
@@ -25,7 +24,7 @@ import {
   serverTimestamp,
 } from "firebase/database";
 
-import { auth, db, database  } from "../../firebase";
+import { auth, db, database } from "../../firebase";
 export const Context = createContext();
 
 export const Provider = ({ children }) => {
@@ -41,6 +40,7 @@ export const Provider = ({ children }) => {
   const [isModalVisible, setIsModalVisible] = useState("");
   const [usersData, setUsersData] = useState([]);
   const [isModalFriend, setIsModalFriend] = useState("");
+  const [selectedFriend, setSelectedFriend] = useState("");
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
@@ -135,14 +135,16 @@ export const Provider = ({ children }) => {
   const handleSend = async () => {
     if (infoUser) {
       if (inputValue.trim() === "") return;
-      console.log(collection(db, "messages"));
+      const roomId = selectedRoom
+        ? selectedRoom.id
+        : [infoUser.uid, selectedFriend.uid].sort().join("_");
       try {
         const message = await addDoc(collection(db, "messages"), {
           createAt: new Date(),
           text: inputValue,
           displayName: infoUser.displayName,
           photoURL: infoUser.photoURL,
-          roomId: selectedRoom.id,
+          roomId: roomId,
           uid: infoUser.uid,
         });
         console.log("Document written with ID: ", message.id);
@@ -164,11 +166,12 @@ export const Provider = ({ children }) => {
     },
   ]);
   useEffect(() => {
-    if (!selectedRoom.id) return;
-    const q = query(
-      collection(db, "messages"),
-      where("roomId", "==", selectedRoom.id)
-    );
+    if (!infoUser || (!selectedRoom && !selectedFriend)) return;
+
+    const roomId = selectedRoom
+      ? selectedRoom.id
+      : [infoUser.uid, selectedFriend.uid].sort().join("_");
+    const q = query(collection(db, "messages"), where("roomId", "==", roomId));
     const result = onSnapshot(q, (snapshot) => {
       const messData = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -182,7 +185,7 @@ export const Provider = ({ children }) => {
       setMessage(sortedMess);
     });
     return () => result();
-  }, [selectedRoom]);
+  }, [infoUser, selectedRoom, selectedFriend]);
   const [isShowRoomFriend, setIsShowRoomFriend] = useState(true);
   const handleShowRoomFriend = () => {
     setIsShowRoomFriend(true);
@@ -325,13 +328,13 @@ export const Provider = ({ children }) => {
       return () => unsubscribe();
     });
   }, [usersData]);
-  const [isMenu, setIsMenu] = useState(false);
+  const [isMenu, setIsMenu] = useState("");
 
   const [activeTab, setActiveTab] = useState("menu_notifications");
   const [isContact, setIsContact] = useState(false);
   const handleShowContact = () => {
     setIsContact(!isContact);
-    setActiveTab("menu_addFriend")
+    setActiveTab("menu_friends");
   };
   const [addFriends, setAddFriends] = useState([]);
   useEffect(() => {
@@ -348,10 +351,12 @@ export const Provider = ({ children }) => {
     });
     return () => unsubscribe();
   }, [infoUser]);
-  const [selectedFriend, setSelectedFriend] = useState("");
   const handleShowChatFriend = (friend) => {
-    setSelectedFriend(friend);
-  }
+    setSelectedRoom("");
+    if (friend && friend.uid) {
+      setSelectedFriend(friend);
+    }
+  };
   return (
     <Context.Provider
       value={{
@@ -373,6 +378,7 @@ export const Provider = ({ children }) => {
         isModalFriend,
         addFriends,
         selectedFriend,
+        setShowEmoji,
         setIsContact,
         setInputValue,
         setInfoUser,
@@ -393,7 +399,7 @@ export const Provider = ({ children }) => {
         handleSelectedReactIcon,
         handleShowEmoji,
         handleShowContact,
-        handleShowChatFriend
+        handleShowChatFriend,
       }}
     >
       {children}

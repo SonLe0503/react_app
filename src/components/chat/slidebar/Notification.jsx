@@ -38,11 +38,11 @@ function Notification() {
     const user1Query = query(collection(db, "users"), where("uid", "==", fromUserId));
     const user1Snapshot = await getDocs(user1Query);
     const user1Doc = user1Snapshot.docs[0];
-    
+
     const user2Query = query(collection(db,"users"),where("uid", "==", infoUser.uid));
     const user2Snapshot = await getDocs(user2Query);
     const user2Doc = user2Snapshot.docs[0];
-    
+
     if(user1Doc){
       await updateDoc(user1Doc.ref,{
         friends: arrayUnion(infoUser.uid)
