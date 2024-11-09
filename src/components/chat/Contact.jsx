@@ -2,26 +2,17 @@ import { UserAddOutlined, UserDeleteOutlined, CheckCircleOutlined } from "@ant-d
 
 import { Avatar, Modal, Input, Button } from "antd";
 
-import {
-  collection,
-  onSnapshot,
-  query,
-  where,
-  addDoc,
-  doc,
-  getDocs,
-  deleteDoc,
-} from "firebase/firestore";
+import { collection, onSnapshot, query, where, addDoc, doc, getDocs, deleteDoc } from "firebase/firestore";
 
 import { useContext, useEffect, useState } from "react";
 
-import { db } from "../../firebase";
-import { Context } from "../context/Context";
+import { db } from "@/config/firebase";
+import { AppContext } from "@/context/AppContext.jsx";
 function Contact() {
-  const { isContact, setIsContact, infoUser, addFriends } = useContext(Context);
+  const { isContact, setIsContact, infoUser, addFriends } = useContext(AppContext);
   const handleCancel = () => {
     setIsContact(false);
-    setSearchQuery("")
+    setSearchQuery("");
   };
   const [users, setUsers] = useState([]);
   useEffect(() => {
@@ -40,9 +31,7 @@ function Contact() {
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
-    const exactMatch = users.filter(
-      (user) => user.email && user.email.toLowerCase() === value.toLowerCase()
-    );
+    const exactMatch = users.filter((user) => user.email && user.email.toLowerCase() === value.toLowerCase());
     setFiltered(exactMatch);
   };
   const handleAddFriend = async (userUid) => {
@@ -55,11 +44,7 @@ function Contact() {
     console.log("Friend request sent", friend.id);
   };
   const handleUnFriend = async (userUid) => {
-    const q = query(
-      collection(db, "friend_requests"),
-      where("from", "==", infoUser.uid),
-      where("to", "==", userUid)
-    );
+    const q = query(collection(db, "friend_requests"), where("from", "==", infoUser.uid), where("to", "==", userUid));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach(async (docSnapshot) => {
       await deleteDoc(doc(db, "friend_requests", docSnapshot.id));
@@ -78,25 +63,13 @@ function Contact() {
         ]}
         title="Contacts"
       >
-        <Input
-          placeholder="Contacts"
-          style={{ width: "100%" }}
-          value={searchQuery}
-          onChange={handleSearch}
-        />
+        <Input placeholder="Contacts" style={{ width: "100%" }} value={searchQuery} onChange={handleSearch} />
         {searchQuery && filtered.length > 0
           ? filtered.map((user) => {
-              const friendRequests = addFriends?.find(
-                (friend) =>
-                  friend.to === user.uid && friend.status === "pending"
-              );
+              const friendRequests = addFriends?.find((friend) => friend.to === user.uid && friend.status === "pending");
               return (
                 <div key={user.uid}>
-                  <div
-                    style={{ color: "rgba(0, 0, 0, 0.7)", marginTop: "15px" }}
-                  >
-                    You may be familiar with
-                  </div>
+                  <div style={{ color: "rgba(0, 0, 0, 0.7)", marginTop: "15px" }}>You may be familiar with</div>
                   <div
                     style={{
                       background: "rgba(0,0,0,0.3)",
@@ -112,30 +85,20 @@ function Contact() {
                       <Avatar src={user.photoURL}></Avatar>
                       <div style={{ marginLeft: "10px" }}>
                         <div>{user.displayName}</div>
-                        <div style={{ color: "rgba(0, 0, 0, 0.5)" }}>
-                          Friends suggestions
-                        </div>
+                        <div style={{ color: "rgba(0, 0, 0, 0.5)" }}>Friends suggestions</div>
                       </div>
                     </div>
                     {user.friends && user.friends.includes(infoUser.uid) ? (
-                      <div style={{background:"#3366FF", color:"#fff", borderRadius:"10px", padding:"10px", display: "flex"}}>
-                        <div style={{marginRight:"5px"}}>{<CheckCircleOutlined/>}</div>
-                        <div style={{marginLeft:"5px"}}>Bạn bè</div>
+                      <div style={{ background: "#3366FF", color: "#fff", borderRadius: "10px", padding: "10px", display: "flex" }}>
+                        <div style={{ marginRight: "5px" }}>{<CheckCircleOutlined />}</div>
+                        <div style={{ marginLeft: "5px" }}>Bạn bè</div>
                       </div>
                     ) : friendRequests ? (
-                      <Button
-                        icon={<UserDeleteOutlined />}
-                        type="default"
-                        onClick={() => handleUnFriend(user.uid)}
-                      >
+                      <Button icon={<UserDeleteOutlined />} type="default" onClick={() => handleUnFriend(user.uid)}>
                         Huỷ kết bạn
                       </Button>
                     ) : (
-                      <Button
-                        icon={<UserAddOutlined />}
-                        type="primary"
-                        onClick={() => handleAddFriend(user.uid)}
-                      >
+                      <Button icon={<UserAddOutlined />} type="primary" onClick={() => handleAddFriend(user.uid)}>
                         Thêm bạn bè
                       </Button>
                     )}

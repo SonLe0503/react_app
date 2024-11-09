@@ -38,29 +38,23 @@ function StickerPicker({ handleSelectedReactIcon }) {
   const fetchGifs = async (query, offset) => {
     try {
       const endpoint = query ? "search" : "trending";
-      const response = await axios.get(
-        `https://api.giphy.com/v1/gifs/${endpoint}`,
-        {
-          params: {
-            api_key: "0XmWL4pABnjSg8w6cr4Ro4rzGC9MOFv3",
-            q: query,
-            limit: 20,
-            offset: offset,
-          },
-        }
-      );
+      const response = await axios.get(`https://api.giphy.com/v1/gifs/${endpoint}`, {
+        params: {
+          api_key: "0XmWL4pABnjSg8w6cr4Ro4rzGC9MOFv3",
+          q: query,
+          limit: 20,
+          offset: offset,
+        },
+      });
 
-      setGifs((prevGifs) =>
-        offset === 0 ? response.data.data : [...prevGifs, ...response.data.data]
-      );
+      setGifs((prevGifs) => (offset === 0 ? response.data.data : [...prevGifs, ...response.data.data]));
     } catch (error) {
       console.error("Error fetching GIFs:", error);
     }
   };
   const handleScroll = (e) => {
     console.log("scroll");
-    const bottom =
-      e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
+    const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
     if (bottom) {
       const newOffset = offset + 20;
       setOffset(newOffset);
@@ -102,7 +96,7 @@ function StickerPicker({ handleSelectedReactIcon }) {
       folderData.map(async (folder) => ({
         folderName: folder.folderName,
         images: await folder.images,
-      }))
+      })),
     );
   };
   useEffect(() => {
@@ -116,22 +110,13 @@ function StickerPicker({ handleSelectedReactIcon }) {
     <>
       <div className="sticker_container">
         <div className="sticker_header">
-          <div
-            className={`tab ${activeTab === "emoji" ? "active" : ""}`}
-            onClick={() => setActiveTab("emoji")}
-          >
+          <div className={`tab ${activeTab === "emoji" ? "active" : ""}`} onClick={() => setActiveTab("emoji")}>
             Emoji
           </div>
-          <div
-            className={`tab ${activeTab === "stickers" ? "active" : ""}`}
-            onClick={() => setActiveTab("stickers")}
-          >
+          <div className={`tab ${activeTab === "stickers" ? "active" : ""}`} onClick={() => setActiveTab("stickers")}>
             Sticker
           </div>
-          <div
-            className={`tab ${activeTab === "Gifs" ? "active" : ""}`}
-            onClick={() => setActiveTab("Gifs")}
-          >
+          <div className={`tab ${activeTab === "Gifs" ? "active" : ""}`} onClick={() => setActiveTab("Gifs")}>
             Gifs
           </div>
         </div>
@@ -158,9 +143,7 @@ function StickerPicker({ handleSelectedReactIcon }) {
             <div className="content_stickers">
               {stickers.map((stickerGroup, index) => (
                 <div key={index}>
-                  <div className="content_stickers_group">
-                    {stickerGroup.folderName.replaceAll("/", "")}
-                  </div>
+                  <div className="content_stickers_group">{stickerGroup.folderName.replaceAll("/", "")}</div>
                   <div
                     style={{
                       display: "grid",
@@ -168,13 +151,7 @@ function StickerPicker({ handleSelectedReactIcon }) {
                     }}
                   >
                     {stickerGroup.images.map((sticker, idx) => (
-                      <img
-                        key={idx}
-                        src={sticker}
-                        alt={`sticker-${idx}`}
-                        onClick={handleClickSticker}
-                        className="content_stickers_img"
-                      ></img>
+                      <img key={idx} src={sticker} alt={`sticker-${idx}`} onClick={handleClickSticker} className="content_stickers_img"></img>
                     ))}
                   </div>
                 </div>
