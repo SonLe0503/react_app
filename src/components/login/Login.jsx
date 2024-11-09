@@ -9,8 +9,8 @@ import { addDoc, collection } from "firebase/firestore";
 
 import { useContext } from "react";
 
-import { provider, db } from "../../config/firebase.js";
-import { AppContext } from "../../context/AppContext.jsx";
+import { provider, db } from "@/config/firebase";
+import { AppContext } from "@/context/AppContext";
 const Container = styled.div`
   display: flex;
   justify-content: center;
