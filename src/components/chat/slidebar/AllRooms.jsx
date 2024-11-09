@@ -1,36 +1,22 @@
 import { Col, Button, Collapse } from "antd";
 
 import { useContext } from "react";
-
-import { Context } from "../../context/Context";
+import { AppContext } from "@/context/AppContext";
 const { Panel } = Collapse;
 function AllRooms() {
-  const {
-    rooms,
-    selectedRoom,
-    handleShowMess,
-    handleShowRoomFriend,
-    isShowRoomFriend,
-    usersData,
-    userState,
-  } = useContext(Context);
+  const { rooms, selectedRoom, handleShowMess, handleShowRoomFriend, isShowRoomFriend, usersData, userState } = useContext(AppContext);
   return (
     <>
       <Col span={24}>
         <div className="list_content">
           <Collapse defaultActiveKey={["1"]} className="list_content_col">
-            <Panel
-              header="All rooms "
-              key={["1"]}
-              className="list_content_panel"
-            >
+            <Panel header="All rooms " key={["1"]} className="list_content_panel">
               <div className="list_content_button">
                 {rooms.map((room) => (
                   <Button
                     key={room.id}
                     style={{
-                      backgroundColor:
-                        selectedRoom.id === room.id ? "#fff" : "transparent ",
+                      backgroundColor: selectedRoom.id === room.id ? "#fff" : "transparent ",
                     }}
                     className="btn_roomName"
                     onClick={() => handleShowMess(room)}
@@ -46,29 +32,18 @@ function AllRooms() {
       {isShowRoomFriend && (
         <Col className="list2" span={24} style={{ marginTop: "20px" }}>
           <Collapse defaultActiveKey={["1"]} className="list_content_col2">
-            <Panel
-              header={`Friend in room: ${selectedRoom.roomName} `}
-              key={["1"]}
-              className="list_content_panel2"
-            >
+            <Panel header={`Friend in room: ${selectedRoom.roomName} `} key={["1"]} className="list_content_panel2">
               <div className="list_content_panel2_element">
                 {usersData.map((user) => (
                   <div key={user.id} className="roomMembers">
                     <div
                       style={{
-                        backgroundColor:
-                          userState[user.uid] &&
-                          userState[user.uid].state === "offline"
-                            ? "transparent"
-                            : "green",
+                        backgroundColor: userState[user.uid] && userState[user.uid].state === "offline" ? "transparent" : "green",
                       }}
                       className="roomMembers_element"
                     ></div>
                     <span>
-                      {user.displayName}{" "}
-                      {userState[user.uid] &&
-                        userState[user.uid].state === "offline" &&
-                        userState[user.uid].offlineDuration}
+                      {user.displayName} {userState[user.uid] && userState[user.uid].state === "offline" && userState[user.uid].offlineDuration}
                     </span>
                   </div>
                 ))}

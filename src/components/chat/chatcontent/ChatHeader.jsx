@@ -4,10 +4,9 @@ import { useContext } from "react";
 
 import { Button, Avatar } from "antd";
 
-import { Context } from "../../context/Context";
+import { AppContext } from "@/context/AppContext";
 function ChatHeader() {
-  const { selectedRoom, handleShowModalFriend, usersData, selectedFriend } =
-    useContext(Context);
+  const { selectedRoom, handleShowModalFriend, usersData, selectedFriend } = useContext(AppContext);
   return (
     <>
       <div className="chat_header">
@@ -21,11 +20,7 @@ function ChatHeader() {
             </div>
             <div className="header_invitation">
               <div className="invitation_button">
-                <Button
-                  className="btn_inivite"
-                  onClick={() => handleShowModalFriend()}
-                  icon={<UserAddOutlined />}
-                >
+                <Button className="btn_inivite" onClick={() => handleShowModalFriend()} icon={<UserAddOutlined />}>
                   Inivite
                 </Button>
                 <Avatar.Group max={{ count: 2 }}>

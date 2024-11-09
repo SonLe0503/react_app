@@ -1,4 +1,3 @@
-
 import { GoogleOutlined, FacebookOutlined } from "@ant-design/icons";
 
 import { Row, Col, Button } from "antd";
@@ -10,8 +9,8 @@ import { addDoc, collection } from "firebase/firestore";
 
 import { useContext } from "react";
 
-import { provider, db } from "../../firebase";
-import {Context} from "../context/Context";
+import { provider, db } from "@/config/firebase";
+import { AppContext } from "@/context/AppContext";
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -27,7 +26,7 @@ const Container = styled.div`
   }
 `;
 function Login() {
-  const {history} = useContext(Context);
+  const { history } = useContext(AppContext);
   const auth = getAuth();
   const handleLogin = () => {
     signInWithPopup(auth, provider)
@@ -59,26 +58,14 @@ function Login() {
               <img src="logo.png" alt="App Logo" style={{ width: 100 }} />
             </Col>
             <Col>
-              <Row
-                gutter={[16, 16]}
-                style={{ height: "100%", alignItems: "flex-start" }}
-              >
+              <Row gutter={[16, 16]} style={{ height: "100%", alignItems: "flex-start" }}>
                 <Col span={24}>
-                  <Button
-                    type="primary"
-                    icon={<GoogleOutlined />}
-                    style={{ width: "100%" }}
-                    onClick={handleLogin}
-                  >
+                  <Button type="primary" icon={<GoogleOutlined />} style={{ width: "100%" }} onClick={handleLogin}>
                     <span>Login with Google</span>
                   </Button>
                 </Col>
                 <Col span={24}>
-                  <Button
-                    type="primary"
-                    icon={<FacebookOutlined />}
-                    style={{ width: "100%" }}
-                  >
+                  <Button type="primary" icon={<FacebookOutlined />} style={{ width: "100%" }}>
                     <span>Login with Facebook</span>
                   </Button>
                 </Col>

@@ -1,21 +1,13 @@
-
 import { Modal, Avatar, Select } from "antd";
 
-import {
-  collection,
-  onSnapshot,
-  updateDoc,
-  doc,
-  query,
-  where,
-} from "firebase/firestore";
+import { collection, onSnapshot, updateDoc, doc, query, where } from "firebase/firestore";
 
 import { useContext, useEffect, useState } from "react";
 
-import { db } from "../../firebase";
-import { Context } from "../context/Context";
+import { db } from "@/config/firebase";
+import { AppContext } from "@/context/AppContext";
 function AddFriend() {
-  const {isModalFriend, setIsModalFriend, selectedRoom} = useContext(Context)
+  const { isModalFriend, setIsModalFriend, selectedRoom } = useContext(AppContext);
   const handleCancel = () => {
     setIsModalFriend(!isModalFriend);
     setSearchQuery("");
@@ -34,10 +26,7 @@ function AddFriend() {
   const [users, setUsers] = useState([]);
   useEffect(() => {
     if (selectedRoom) {
-      const q = query(
-        collection(db, "users"),
-        where("uid", "not-in", selectedRoom.members)
-      );
+      const q = query(collection(db, "users"), where("uid", "not-in", selectedRoom.members));
       const result = onSnapshot(q, async (snapshot) => {
         const usersData = snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -49,21 +38,14 @@ function AddFriend() {
     }
   }, [selectedRoom]);
   const [searchQuery, setSearchQuery] = useState("");
-  const filtered = users.filter((user) =>
-    user.displayName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filtered = users.filter((user) => user.displayName.toLowerCase().includes(searchQuery.toLowerCase()));
   const [selectedUsers, setSelectedUsers] = useState([]);
   const handleSearch = (value) => {
     setSearchQuery(value);
   };
   return (
     <div>
-      <Modal
-        open={isModalFriend}
-        onCancel={handleCancel}
-        title="Inivite"
-        onOk={handleOk}
-      >
+      <Modal open={isModalFriend} onCancel={handleCancel} title="Inivite" onOk={handleOk}>
         <Select
           placeholder="Add Friends"
           style={{ width: "100%" }}
@@ -75,10 +57,7 @@ function AddFriend() {
         >
           {filtered.map((user) => (
             <Select.Option key={user.id} value={user.uid}>
-              <Avatar
-                src={user.photoURL}
-                style={{ width: "25px", height: "25px" }}
-              ></Avatar>
+              <Avatar src={user.photoURL} style={{ width: "25px", height: "25px" }}></Avatar>
               <span style={{ margin: "10px" }}>{user.displayName}</span>
             </Select.Option>
           ))}

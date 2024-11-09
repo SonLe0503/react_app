@@ -4,22 +4,17 @@ import { isToday, format, isYesterday, isSameWeek } from "date-fns";
 
 import { Avatar } from "antd";
 
-import { Context } from "../../context/Context";
+import { AppContext } from "@/context/AppContext";
 function ChatMessage() {
-  const { message, currentUserId } = useContext(Context);
+  const { message, currentUserId } = useContext(AppContext);
   const isImageUrl = (url) => {
     return (
-      typeof url === "string" &&
-      (/\.(jpg|jpeg|png|bmp|webp|svg)$/i.test(url) ||
-        /giphy\.com\/media\/.+\/\d+\.gif/.test(url) ||
-        url.endsWith(".gif"))
+      typeof url === "string" && (/\.(jpg|jpeg|png|bmp|webp|svg)$/i.test(url) || /giphy\.com\/media\/.+\/\d+\.gif/.test(url) || url.endsWith(".gif"))
     );
   };
   const convertTimestampToDate = (timestamp) => {
     if (timestamp && timestamp.seconds) {
-      return new Date(
-        timestamp.seconds * 1000 + Math.floor(timestamp.nanoseconds / 1000000)
-      );
+      return new Date(timestamp.seconds * 1000 + Math.floor(timestamp.nanoseconds / 1000000));
     }
     return null;
   };
@@ -44,8 +39,7 @@ function ChatMessage() {
               <div
                 key={msg.id}
                 style={{
-                  alignItems:
-                    msg.uid === currentUserId ? "flex-end" : "flex-start",
+                  alignItems: msg.uid === currentUserId ? "flex-end" : "flex-start",
                 }}
                 className="message"
               >
@@ -63,16 +57,11 @@ function ChatMessage() {
                   className="mess_text"
                 >
                   {isImageUrl(msg.text) ? (
-                    <img
-                      src={msg.text}
-                      alt="sticker or gif"
-                      className="img_display"
-                    />
+                    <img src={msg.text} alt="sticker or gif" className="img_display" />
                   ) : (
                     <span
                       style={{
-                        background:
-                          msg.uid === currentUserId ? "#27A4F2" : "gray",
+                        background: msg.uid === currentUserId ? "#27A4F2" : "gray",
                       }}
                       className="text_display"
                     >

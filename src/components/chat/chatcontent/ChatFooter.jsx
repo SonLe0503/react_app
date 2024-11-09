@@ -2,29 +2,16 @@ import { useContext } from "react";
 
 import { Input } from "antd";
 
-import { useEffect, useRef  } from "react";
+import { useEffect, useRef } from "react";
 
-import StickerPicker from "../sticker/StickerPicker";
-import { Context } from "../../context/Context";
+import StickerPicker from "@/components/chat/sticker/StickerPicker";
+import { AppContext } from "@/context/AppContext";
 function ChatFooter() {
-  const {
-    handleSend,
-    handleShowEmoji,
-    showEmoji,
-    handleSelectedReactIcon,
-    inputValue,
-    setInputValue,
-    setShowEmoji
-  } = useContext(Context);
+  const { handleSend, handleShowEmoji, showEmoji, handleSelectedReactIcon, inputValue, setInputValue, setShowEmoji } = useContext(AppContext);
   const showRef = useRef(null);
   const buttonRef = useRef(null);
-   const handleClickOutside = (event) => {
-    if (
-      showRef.current &&
-      buttonRef.current &&
-      !showRef.current.contains(event.target) &&
-      !buttonRef.current.contains(event.target)
-    ) {
+  const handleClickOutside = (event) => {
+    if (showRef.current && buttonRef.current && !showRef.current.contains(event.target) && !buttonRef.current.contains(event.target)) {
       setShowEmoji(false);
     }
   };
@@ -55,20 +42,11 @@ function ChatFooter() {
                 }
               }}
             ></Input>
-            <img
-              className="send_icon"
-              onClick={handleShowEmoji}
-              src="/happy-icon.png"
-              ref={buttonRef}
-            ></img>
-            <div  className="icon_emoji">
+            <img className="send_icon" onClick={handleShowEmoji} src="/happy-icon.png" ref={buttonRef}></img>
+            <div className="icon_emoji">
               {showEmoji && (
                 <div ref={showRef} className="icon_emoji_box">
-                  {
-                    <StickerPicker
-                      handleSelectedReactIcon={handleSelectedReactIcon}
-                    />
-                  }
+                  {<StickerPicker handleSelectedReactIcon={handleSelectedReactIcon} />}
                 </div>
               )}
             </div>

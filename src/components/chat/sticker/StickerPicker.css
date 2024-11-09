@@ -1,4 +1,4 @@
-.sticker_container{
+.sticker_container {
   margin-top: auto;
   display: flex;
   width: 400px;
@@ -9,49 +9,49 @@
   margin-right: 20px;
   box-sizing: border-box;
 }
-.sticker_header{
+.sticker_header {
   display: flex;
   height: 50px;
   width: 100%;
   box-sizing: border-box;
   color: rgba(255, 255, 255, 0.7);
-  background-color: rgba(0, 0, 0, 0.8) ;
+  background-color: rgba(0, 0, 0, 0.8);
 }
-.tab{
+.tab {
   width: 100%;
   text-align: center;
   line-height: 50px;
   border-radius: 15px;
   transition: background-color 0.1s ease;
 }
-.tab.active{
+.tab.active {
   background-color: rgba(255, 255, 255, 0.5);
 }
-.tab:hover{
+.tab:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
-.sticker_content{
+.sticker_content {
   width: 100%;
   height: 100%;
 }
-.content_stickers{
+.content_stickers {
   width: 100%;
   height: 100%;
   overflow-y: auto;
   background-color: rgba(0, 0, 0, 0.8);
 }
-.content_Gifs{
+.content_Gifs {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.8);
 }
-.content_stickers_group{
-  color:rgba(255, 255, 255, 0.7) ;
+.content_stickers_group {
+  color: rgba(255, 255, 255, 0.7);
   font-size: 18px;
   margin-bottom: 15px;
   text-align: center;
 }
-.content_stickers_img{
+.content_stickers_img {
   width: 70px;
   height: 70px;
   cursor: pointer;
@@ -59,7 +59,7 @@
   transition: background-color 0.3s;
   margin-bottom: 10px;
 }
-.Gifs_search{
+.Gifs_search {
   width: calc(100% - 20px);
   padding: 15px;
   border-radius: 10px;
@@ -70,14 +70,14 @@
   font-size: 15px;
   color: #fff;
 }
-.Gifs_listelement{
+.Gifs_listelement {
   width: 100%;
   height: calc(100% - 60px);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   overflow-y: auto;
 }
-.Gifs_element{
+.Gifs_element {
   width: 100%;
   height: auto;
   cursor: pointer;

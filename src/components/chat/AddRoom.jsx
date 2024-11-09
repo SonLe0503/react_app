@@ -1,20 +1,14 @@
 /* eslint-disable react/prop-types */
 import { Modal, Button, Form, Input } from "antd";
 
-import {
-  addDoc,
-  arrayUnion,
-  collection,
-  updateDoc,
-  doc,
-} from "firebase/firestore";
+import { addDoc, arrayUnion, collection, updateDoc, doc } from "firebase/firestore";
 
 import { useContext } from "react";
 
-import { db } from "../../firebase";
-import { Context } from "../context/Context";
+import { db } from "@/config/firebase";
+import { AppContext } from "@/context/AppContext";
 function AddRoom() {
-  const {isModalVisible, setIsModalVisible, infoUser} = useContext(Context);
+  const { isModalVisible, setIsModalVisible, infoUser } = useContext(AppContext);
   const [form] = Form.useForm();
   const onSubmit = () => {
     form
@@ -47,40 +41,18 @@ function AddRoom() {
   };
   return (
     <div>
-      <Modal
-        open={isModalVisible}
-        title="Create Room"
-        onCancel={handleCancel}
-        footer={null}
-      >
-        <Form
-          layout="vertical"
-          name="add_room"
-          initialValues={{ remember: true }}
-          form={form}
-        >
-          <Form.Item
-            label="Room Name"
-            name="roomName"
-            rules={[{ required: true, message: "Please enter room name!" }]}
-          >
+      <Modal open={isModalVisible} title="Create Room" onCancel={handleCancel} footer={null}>
+        <Form layout="vertical" name="add_room" initialValues={{ remember: true }} form={form}>
+          <Form.Item label="Room Name" name="roomName" rules={[{ required: true, message: "Please enter room name!" }]}>
             <Input placeholder="Enter room name" />
           </Form.Item>
 
-          <Form.Item
-            label="Description"
-            name="description"
-            rules={[{ required: true, message: "Please enter description!" }]}
-          >
+          <Form.Item label="Description" name="description" rules={[{ required: true, message: "Please enter description!" }]}>
             <Input placeholder="Enter description" />
           </Form.Item>
 
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button
-              type="default"
-              onClick={handleCancel}
-              style={{ marginRight: "10px" }}
-            >
+            <Button type="default" onClick={handleCancel} style={{ marginRight: "10px" }}>
               Cancel
             </Button>
             <Button type="primary" onClick={onSubmit}>
