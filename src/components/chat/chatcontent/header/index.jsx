@@ -1,13 +1,17 @@
+import { AppContext } from "@/context/AppContext";
+
 import { UserAddOutlined } from "@ant-design/icons";
 
-import { useContext } from "react";
+import { useContext, useState } from "react";
 
 import { Button, Avatar } from "antd";
-
-import { Context } from "../../context/Context";
 function ChatHeader() {
-  const { selectedRoom, handleShowModalFriend, usersData, selectedFriend } =
-    useContext(Context);
+  const { selectedRoom, usersData, selectedFriend } =
+    useContext(AppContext);
+    const [isModalFriend, setIsModalFriend] = useState("");
+    const handleShowModalFriend = () => {
+      setIsModalFriend(!isModalFriend);
+    };
   return (
     <>
       <div className="chat_header">
@@ -39,7 +43,7 @@ function ChatHeader() {
         ) : selectedFriend ? (
           <div className="header">
             <div className="header_info">
-              <div className="header_avaname">
+              <div className="header_avatar_name">
                 <Avatar src={selectedFriend.photoURL}></Avatar>
                 <div className="info_name2">{selectedFriend.displayName}</div>
               </div>

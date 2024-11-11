@@ -1,4 +1,6 @@
-/* eslint-disable react/prop-types */
+import { db } from "@/firebase.js";
+import { AppContext } from "@/context/AppContext";
+
 import { Modal, Button, Form, Input } from "antd";
 
 import {
@@ -10,11 +12,9 @@ import {
 } from "firebase/firestore";
 
 import { useContext } from "react";
-
-import { db } from "../../firebase";
-import { Context } from "../context/Context";
 function AddRoom() {
-  const {isModalVisible, setIsModalVisible, infoUser} = useContext(Context);
+  const { isModalVisible, setIsModalVisible, infoUser } =
+    useContext(AppContext);
   const [form] = Form.useForm();
   const onSubmit = () => {
     form

@@ -1,12 +1,12 @@
+import { AppContext } from "@/context/AppContext";
+
 import { useContext } from "react";
 
 import { isToday, format, isYesterday, isSameWeek } from "date-fns";
 
 import { Avatar } from "antd";
-
-import { Context } from "../../context/Context";
 function ChatMessage() {
-  const { message, currentUserId } = useContext(Context);
+  const { message, currentUserId } = useContext(AppContext);
   const isImageUrl = (url) => {
     return (
       typeof url === "string" &&
@@ -18,7 +18,7 @@ function ChatMessage() {
   const convertTimestampToDate = (timestamp) => {
     if (timestamp && timestamp.seconds) {
       return new Date(
-        timestamp.seconds * 1000 + Math.floor(timestamp.nanoseconds / 1000000)
+        timestamp.seconds * 1000 + Math.floor(timestamp.nanoseconds / 1000000),
       );
     }
     return null;
@@ -35,7 +35,7 @@ function ChatMessage() {
   };
   return (
     <>
-      <div className="chat_listmessage">
+      <div className="chat_list_message">
         <div className="list_message">
           {message.map((msg) => {
             const createAtDate = convertTimestampToDate(msg.createAt);

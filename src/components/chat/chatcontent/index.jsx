@@ -1,20 +1,20 @@
+import { AppContext } from "@/context/AppContext";
+
 import { Col } from "antd";
 
 import { useContext } from "react";
 
-import { Context } from "../../context/Context";
-
-import "./ChatContent.css";
-import ChatFooter from "./ChatFooter";
-import ChatHeader from "./ChatHeader";
-import ChatMessage from "./ChatMessage";
+import ChatFooter from "./footer";
+import ChatHeader from "./header";
+import "./index.css";
+import ChatMessage from "./message";
 function ChatContent() {
-  const { selectedRoom, selectedFriend } = useContext(Context);
+  const { selectedRoom, selectedFriend } = useContext(AppContext);
   return (
     <>
-      <Col span={18} className="chatcontent">
+      <Col span={18} className="chat_content">
         {selectedRoom || selectedFriend ? (
-          <div className="chatcontent_container">
+          <div className="chat_content_container">
             <ChatHeader></ChatHeader>
             <div className="chat_message">
               <ChatMessage></ChatMessage>
@@ -23,7 +23,7 @@ function ChatContent() {
           </div>
         ) : (
           <p className="p">
-            Chọn một phòng hoặc một người bạn để bắt đầu trò chuyện ngay nào !!!
+            Choose a room or a friend to start chatting right away!
           </p>
         )}
       </Col>

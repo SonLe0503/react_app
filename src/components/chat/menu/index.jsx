@@ -1,3 +1,5 @@
+import { AppContext } from "@/context/AppContext";
+
 import {
   UserOutlined,
   AppstoreOutlined,
@@ -6,16 +8,15 @@ import {
   UserAddOutlined,
 } from "@ant-design/icons";
 
-import { useContext, } from "react";
+import { useContext } from "react";
 
-import { Context } from "../../context/Context";
-
-import "./Menu.css";
+import "./index.css";
 function Menu() {
-  const {activeTab, setActiveTab, handleShowModal, handleShowContact,} = useContext(Context);
+  const { activeTab, setActiveTab, handleShowModal, handleShowContact } =
+    useContext(AppContext);
   return (
     <>
-      <div className="menu_container" >
+      <div className="menu_container">
         <div
           className={`tab1 ${activeTab === "menu_friends" ? "active" : ""}`}
           onClick={() => setActiveTab("menu_friends")}

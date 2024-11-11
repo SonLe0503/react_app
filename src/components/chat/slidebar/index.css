@@ -130,8 +130,8 @@
   width: 40px;
   border-radius: 20px;
 }
-.img_menu:hover{
-  background-color: #fff;
+.img_menu:hover {
+  background-color: rgba(255, 255, 255, 1);
 }
 .list_notifications {
   margin-top: 10px;
@@ -147,26 +147,26 @@
   align-items: center;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
 }
-.infoUser_notification:hover{
+.infoUser_notification:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
 .infoUser_details {
   display: flex;
   align-items: center;
 }
-.btn_notifications{
+.btn_notifications {
   display: flex;
 }
 
-.friends_btn{
+.friends_btn {
   margin: 10px;
   border-radius: 10px;
   padding: 10px;
 }
-.info_friends{
+.info_friends {
   display: flex;
   align-items: center;
 }
-.friends_btn:hover{
+.friends_btn:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }

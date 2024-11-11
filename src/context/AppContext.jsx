@@ -1,5 +1,7 @@
 /* eslint-disable react/prop-types */
 
+import { auth, db, database } from "@/firebase.js";
+
 import { createContext } from "react";
 
 import { onAuthStateChanged, signOut } from "firebase/auth";
@@ -14,7 +16,6 @@ import {
   getDocs,
   query,
   where,
-  addDoc,
 } from "firebase/firestore";
 import {
   onDisconnect,
@@ -23,11 +24,9 @@ import {
   set,
   serverTimestamp,
 } from "firebase/database";
+export const AppContext = createContext();
 
-import { auth, db, database } from "../../firebase";
-export const Context = createContext();
-
-export const Provider = ({ children }) => {
+export const AppProvider = ({ children }) => {
   const history = useHistory();
   const [infoUser, setInfoUser] = useState({
     displayName: "",
@@ -39,57 +38,29 @@ export const Provider = ({ children }) => {
   const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
   const [isModalVisible, setIsModalVisible] = useState("");
   const [usersData, setUsersData] = useState([]);
-  const [isModalFriend, setIsModalFriend] = useState("");
   const [selectedFriend, setSelectedFriend] = useState("");
-  useEffect(() => {
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        const infoUser = {
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          uid: user.uid,
-        };
-        setInfoUser(infoUser);
-        history.push("/");
-        return;
-      }
-      history.push("/login");
-      return;
-    });
-  }, []);
-  useEffect(() => {
-    if (currentUserId) {
-      const result = onSnapshot(collection(db, "rooms"), async (snapshot) => {
-        const roomsData = snapshot.docs
-          .map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }))
-          .filter(
-            (room) => room.members && room.members.includes(currentUserId)
-          );
-        const memberUids = roomsData.flatMap((room) => room.members);
-        const q = query(
-          collection(db, "users"),
-          where("uid", "in", memberUids)
-        );
-        const querySnapshot = await getDocs(q);
-        let usersData = [];
-        usersData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        if (selectedRoom) {
-          usersData = usersData.filter((elm) =>
-            selectedRoom.members.includes(elm.uid)
-          );
-        }
-        setUsersData(usersData);
-        setRooms(roomsData);
-      });
-      return () => result();
+
+  const [userState, setUserState] = useState("offline");
+  const [activeTab, setActiveTab] = useState("menu_allrooms");
+  const [isContact, setIsContact] = useState(false);
+  const [isMenu, setIsMenu] = useState("");
+  const [message, setMessage] = useState([
+    {
+      id: "",
+      createAt: "",
+      displayName: "",
+      photoURL: "",
+      roomId: "",
+      text: "",
+      uid: "",
+    },
+  ]);
+  const handleShowChatFriend = (friend) => {
+    setSelectedRoom("");
+    if (friend && friend.uid) {
+      setSelectedFriend(friend);
     }
-  }, [currentUserId, selectedRoom]);
+  };
   const handleShowModal = () => {
     setIsModalVisible(!isModalVisible);
     setActiveTab("menu_addroom");
@@ -104,67 +75,49 @@ export const Provider = ({ children }) => {
   const handleShowMess = (room) => {
     setSelectedRoom(room);
   };
-  const handleShowModalFriend = () => {
-    setIsModalFriend(!isModalFriend);
-  };
-  const [showEmoji, setShowEmoji] = useState("");
-  const handleShowEmoji = () => {
-    setShowEmoji((prev) => !prev);
-  };
-  const [inputValue, setInputValue] = useState("");
-  const handleSelectedReactIcon = (obj) => {
-    const { type, data } = obj;
 
-    if (type === "emoji") {
-      setInputValue((prevInputValue) => prevInputValue + data);
-    }
+  const setUpPresence = (userId) => {
+    const userStatusDatabaseRef = ref(database, `/status/${userId}`);
+    const connectedRef = ref(database, ".info/connected");
 
-    if (["sticker", "gif"].includes(type)) {
-      console.log(data);
-      addDoc(collection(db, "messages"), {
-        createAt: new Date(),
-        text: data,
-        uid: infoUser.uid,
-        displayName: infoUser.displayName,
-        photoURL: infoUser.photoURL,
-        roomId: selectedRoom.id,
-        type: "sticker",
-      });
-    }
-  };
-  const handleSend = async () => {
-    if (infoUser) {
-      if (inputValue.trim() === "") return;
-      const roomId = selectedRoom
-        ? selectedRoom.id
-        : [infoUser.uid, selectedFriend.uid].sort().join("_");
-      try {
-        const message = await addDoc(collection(db, "messages"), {
-          createAt: new Date(),
-          text: inputValue,
-          displayName: infoUser.displayName,
-          photoURL: infoUser.photoURL,
-          roomId: roomId,
-          uid: infoUser.uid,
-        });
-        console.log("Document written with ID: ", message.id);
-      } catch (error) {
-        console.log(error);
+    onValue(connectedRef, (snapshot) => {
+      if (snapshot.val() === false) {
+        return;
       }
-      setInputValue("");
+      onDisconnect(userStatusDatabaseRef).set({
+        state: "offline",
+        last_changed: serverTimestamp(),
+      });
+      set(userStatusDatabaseRef, {
+        state: "online",
+        last_changed: serverTimestamp(),
+      });
+    });
+  };
+  const handleOfflineDuration = (lastChangedTime) => {
+    const currentTime = new Date().getTime();
+    const timeDifference = currentTime - lastChangedTime;
+
+    const secondsOffline = Math.floor(timeDifference / 1000);
+    const minutesOffline = Math.floor(secondsOffline / 60);
+    const hoursOffline = Math.floor(minutesOffline / 60);
+    const daysOffline = Math.floor(hoursOffline / 24);
+
+    if (secondsOffline < 60) {
+      return ` - Last seen: a few seconds ago`;
+    } else if (minutesOffline < 60) {
+      return ` - Last seen: ${minutesOffline} minutes ago`;
+    } else if (hoursOffline < 24) {
+      return ` - Last seen: ${hoursOffline} hours ago`;
+    } else {
+      return ` - Last seen: ${daysOffline} days ago`;
     }
   };
-  const [message, setMessage] = useState([
-    {
-      id: "",
-      createAt: "",
-      displayName: "",
-      photoURL: "",
-      roomId: "",
-      text: "",
-      uid: "",
-    },
-  ]);
+
+  const handleShowContact = () => {
+    setIsContact(!isContact);
+    setActiveTab("menu_friends");
+  };
   useEffect(() => {
     if (!infoUser || (!selectedRoom && !selectedFriend)) return;
 
@@ -186,10 +139,6 @@ export const Provider = ({ children }) => {
     });
     return () => result();
   }, [infoUser, selectedRoom, selectedFriend]);
-  const [isShowRoomFriend, setIsShowRoomFriend] = useState(true);
-  const handleShowRoomFriend = () => {
-    setIsShowRoomFriend(true);
-  };
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -263,44 +212,55 @@ export const Provider = ({ children }) => {
       window.removeEventListener("touchstart", handleUserActivity);
     };
   }, [auth, database]);
-  const setUpPresence = (userId) => {
-    const userStatusDatabaseRef = ref(database, `/status/${userId}`);
-    const connectedRef = ref(database, ".info/connected");
-
-    onValue(connectedRef, (snapshot) => {
-      if (snapshot.val() === false) {
+  useEffect(() => {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        const infoUser = {
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          uid: user.uid,
+        };
+        setInfoUser(infoUser);
+        history.push("/");
         return;
       }
-      onDisconnect(userStatusDatabaseRef).set({
-        state: "offline",
-        last_changed: serverTimestamp(),
-      });
-      set(userStatusDatabaseRef, {
-        state: "online",
-        last_changed: serverTimestamp(),
-      });
+      history.push("/login");
+      return;
     });
-  };
-  const [userState, setUserState] = useState("offline");
-  const handleOfflineDuration = (lastChangedTime) => {
-    const currentTime = new Date().getTime();
-    const timeDifference = currentTime - lastChangedTime;
-
-    const secondsOffline = Math.floor(timeDifference / 1000);
-    const minutesOffline = Math.floor(secondsOffline / 60);
-    const hoursOffline = Math.floor(minutesOffline / 60);
-    const daysOffline = Math.floor(hoursOffline / 24);
-
-    if (secondsOffline < 60) {
-      return ` - Last seen: a few seconds ago`;
-    } else if (minutesOffline < 60) {
-      return ` - Last seen: ${minutesOffline} minutes ago`;
-    } else if (hoursOffline < 24) {
-      return ` - Last seen: ${hoursOffline} hours ago`;
-    } else {
-      return ` - Last seen: ${daysOffline} days ago`;
+  }, []);
+  useEffect(() => {
+    if (currentUserId) {
+      const result = onSnapshot(collection(db, "rooms"), async (snapshot) => {
+        const roomsData = snapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          .filter(
+            (room) => room.members && room.members.includes(currentUserId)
+          );
+        const memberUids = roomsData.flatMap((room) => room.members);
+        const q = query(
+          collection(db, "users"),
+          where("uid", "in", memberUids)
+        );
+        const querySnapshot = await getDocs(q);
+        let usersData = [];
+        usersData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        if (selectedRoom) {
+          usersData = usersData.filter((elm) =>
+            selectedRoom.members.includes(elm.uid)
+          );
+        }
+        setUsersData(usersData);
+        setRooms(roomsData);
+      });
+      return () => result();
     }
-  };
+  }, [currentUserId, selectedRoom]);
   useEffect(() => {
     usersData.forEach((user) => {
       const userStatusRef = ref(database, `/status/${user.uid}`);
@@ -328,37 +288,8 @@ export const Provider = ({ children }) => {
       return () => unsubscribe();
     });
   }, [usersData]);
-  const [isMenu, setIsMenu] = useState("");
-
-  const [activeTab, setActiveTab] = useState("menu_notifications");
-  const [isContact, setIsContact] = useState(false);
-  const handleShowContact = () => {
-    setIsContact(!isContact);
-    setActiveTab("menu_friends");
-  };
-  const [addFriends, setAddFriends] = useState([]);
-  useEffect(() => {
-    const q = query(
-      collection(db, "friend_requests"),
-      where("from", "==", infoUser.uid)
-    );
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const friendsData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setAddFriends(friendsData);
-    });
-    return () => unsubscribe();
-  }, [infoUser]);
-  const handleShowChatFriend = (friend) => {
-    setSelectedRoom("");
-    if (friend && friend.uid) {
-      setSelectedFriend(friend);
-    }
-  };
   return (
-    <Context.Provider
+    <AppContext.Provider
       value={{
         history,
         infoUser,
@@ -367,42 +298,29 @@ export const Provider = ({ children }) => {
         selectedRoom,
         usersData,
         message,
-        isShowRoomFriend,
         userState,
         isMenu,
         activeTab,
-        showEmoji,
-        inputValue,
         currentUserId,
         isContact,
-        isModalFriend,
-        addFriends,
         selectedFriend,
-        setShowEmoji,
         setIsContact,
-        setInputValue,
         setInfoUser,
         setSelectedRoom,
         setIsModalVisible,
         setUsersData,
         setMessage,
-        setIsModalFriend,
         setUserState,
         setIsMenu,
         setActiveTab,
         handleLogOut,
         handleShowMess,
         handleShowModal,
-        handleShowRoomFriend,
-        handleShowModalFriend,
-        handleSend,
-        handleSelectedReactIcon,
-        handleShowEmoji,
         handleShowContact,
         handleShowChatFriend,
       }}
     >
       {children}
-    </Context.Provider>
+    </AppContext.Provider>
   );
 };

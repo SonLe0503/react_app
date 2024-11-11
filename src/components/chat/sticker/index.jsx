@@ -7,7 +7,7 @@ import axios from "axios";
 
 import * as cheerio from "cheerio";
 
-import "./StickerPicker.css";
+import "./index.css";
 const baseURL = "http://cdn.jerrytsq.asia:8080/stickers/";
 function StickerPicker({ handleSelectedReactIcon }) {
   const [activeTab, setActiveTab] = useState("emoji");
@@ -47,11 +47,13 @@ function StickerPicker({ handleSelectedReactIcon }) {
             limit: 20,
             offset: offset,
           },
-        }
+        },
       );
 
       setGifs((prevGifs) =>
-        offset === 0 ? response.data.data : [...prevGifs, ...response.data.data]
+        offset === 0
+          ? response.data.data
+          : [...prevGifs, ...response.data.data],
       );
     } catch (error) {
       console.error("Error fetching GIFs:", error);
@@ -102,7 +104,7 @@ function StickerPicker({ handleSelectedReactIcon }) {
       folderData.map(async (folder) => ({
         folderName: folder.folderName,
         images: await folder.images,
-      }))
+      })),
     );
   };
   useEffect(() => {
@@ -182,7 +184,7 @@ function StickerPicker({ handleSelectedReactIcon }) {
             </div>
           )}
           {activeTab === "Gifs" && (
-            <div className="content_Gifs">
+            <div className="content_gif">
               <input
                 type="text"
                 placeholder="Search GIFs..."
@@ -191,15 +193,15 @@ function StickerPicker({ handleSelectedReactIcon }) {
                   setSearchQuery(e.target.value);
                   setOffset(0);
                 }}
-                className="Gifs_search"
+                className="gif_search"
               ></input>
-              <div className="Gifs_listelement" onScroll={handleScroll}>
+              <div className="gif_list_element hidden" onScroll={handleScroll}>
                 {gifs.map((gif) => (
                   <img
                     key={gif.id}
                     src={gif.images.fixed_height.url}
                     alt={gif.title}
-                    className="Gifs_element"
+                    className="gif_element"
                     onClick={() =>
                       handleSelectedReactIcon({
                         type: "gif",

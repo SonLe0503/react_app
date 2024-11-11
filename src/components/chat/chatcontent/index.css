@@ -1,4 +1,4 @@
-.chatcontent {
+.chat_content {
   background-image: url(/bgimage.png);
   width: 100%;
   height: 100vh;
@@ -24,20 +24,20 @@
   justify-content: space-between;
   z-index: 10;
 }
-.header_avaname{
+.header_avatar_name {
   display: flex;
   align-items: center;
 }
 .info_name {
-  color: #fff;
+  color: rgba(255, 255, 255, 1);
   font-weight: bold;
 }
 .info_name2 {
-  color: #fff;
+  color: rgba(255, 255, 255, 1);
   margin-left: 10px;
 }
 .info_des {
-  color: #fff;
+  color: rgba(255, 255, 255, 1);
   font-size: 13px;
 }
 .header_invitation {
@@ -51,7 +51,7 @@
 }
 .btn_inivite {
   background: none;
-  color: #fff;
+  color: rgba(255, 255, 255, 1);
   border: none;
   margin-top: auto;
 }
@@ -61,7 +61,7 @@
   position: absolute;
   bottom: 0;
 }
-.chat_listmessage {
+.chat_list_message {
   flex: 1;
   overflow-y: auto;
   display: flex;
@@ -70,7 +70,7 @@
   height: calc(100vh - 146px);
   align-items: center;
 }
-.chat_listmessage::-webkit-scrollbar {
+.chat_list_message::-webkit-scrollbar {
   display: none;
 }
 .list_message {
@@ -93,13 +93,13 @@
   height: 25px;
 }
 .mess_username {
-  color: #fff;
+  color: rgba(255, 255, 255, 1);
   font-weight: bold;
   margin-left: 5px;
   margin-right: 5px;
 }
 .mess_time {
-  color: #fff;
+  color: rgba(255, 255, 255, 1);
   margin-left: 5px;
   font-size: 12px;
 }
@@ -114,7 +114,7 @@
 }
 .text_display {
   margin-left: 35px;
-  color: #fff;
+  color: rgba(255, 255, 255, 1);
   font-size: 14px;
   padding: 7px;
   border-radius: 15px;
@@ -125,7 +125,7 @@
 }
 .footer {
   display: flex;
-  position: relative;
+  /* position: relative; */
   bottom: 0;
   right: 0;
   left: 0;
@@ -155,14 +155,14 @@
 }
 .icon_emoji {
   position: absolute;
-  bottom: 50px;
-  right: 20px;
+  bottom: 70px;
+  right: 8%;
 }
 .icon_emoji_box {
   box-sizing: border-box;
 }
-.p{
-  color: #fff;
+.p {
+  color: rgba(255, 255, 255, 1);
   background-color: rgba(255, 255, 255, 0.5);
   padding: 10px;
   margin: 10px;

@@ -1,3 +1,6 @@
+import { db } from "@/firebase.js";
+import { AppContext } from "@/context/AppContext";
+
 import { Avatar, Button, Col } from "antd";
 
 import {
@@ -14,16 +17,13 @@ import {
 
 import { useContext, useEffect, useState } from "react";
 
-import { db } from "../../../firebase";
-import { Context } from "../../context/Context";
-
 function Notification() {
-  const { infoUser, usersData } = useContext(Context);
+  const { infoUser, usersData } = useContext(AppContext);
   const [friends, setFriends] = useState([]);
   useEffect(() => {
     const q = query(
       collection(db, "friend_requests"),
-      where("to", "==", infoUser.uid)
+      where("to", "==", infoUser.uid),
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const friendsData = snapshot.docs.map((doc) => ({
@@ -35,35 +35,41 @@ function Notification() {
     return () => unsubscribe();
   }, [infoUser]);
   const handleAccept = async (friendRequestId, fromUserId) => {
-    const user1Query = query(collection(db, "users"), where("uid", "==", fromUserId));
+    const user1Query = query(
+      collection(db, "users"),
+      where("uid", "==", fromUserId),
+    );
     const user1Snapshot = await getDocs(user1Query);
     const user1Doc = user1Snapshot.docs[0];
 
-    const user2Query = query(collection(db,"users"),where("uid", "==", infoUser.uid));
+    const user2Query = query(
+      collection(db, "users"),
+      where("uid", "==", infoUser.uid),
+    );
     const user2Snapshot = await getDocs(user2Query);
     const user2Doc = user2Snapshot.docs[0];
 
-    if(user1Doc){
-      await updateDoc(user1Doc.ref,{
-        friends: arrayUnion(infoUser.uid)
+    if (user1Doc) {
+      await updateDoc(user1Doc.ref, {
+        friends: arrayUnion(infoUser.uid),
       });
     }
-    if(user2Doc){
+    if (user2Doc) {
       await updateDoc(user2Doc.ref, {
-        friends: arrayUnion(fromUserId)
+        friends: arrayUnion(fromUserId),
       });
     }
     const friendRequestRef = doc(db, "friend_requests", friendRequestId);
     await deleteDoc(friendRequestRef);
     setFriends((prevFriends) =>
-      prevFriends.filter((friend) => friend.id !== friendRequestId)
+      prevFriends.filter((friend) => friend.id !== friendRequestId),
     );
   };
   const handleReject = async (friendRequestId) => {
     const friendRequestRef = doc(db, "friend_requests", friendRequestId);
     await deleteDoc(friendRequestRef);
     setFriends((prevFriends) =>
-      prevFriends.filter((friend) => friend.id !== friendRequestId)
+      prevFriends.filter((friend) => friend.id !== friendRequestId),
     );
   };
   return (
@@ -74,7 +80,7 @@ function Notification() {
             {usersData.map((user) => {
               const friendRequests = friends?.find(
                 (friend) =>
-                  friend.from === user.uid && friend.status === "pending"
+                  friend.from === user.uid && friend.status === "pending",
               );
               return (
                 <div key={user.uid}>

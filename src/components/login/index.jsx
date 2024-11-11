@@ -1,3 +1,4 @@
+import { provider, db } from "@/firebase.js";
 
 import { GoogleOutlined, FacebookOutlined } from "@ant-design/icons";
 
@@ -8,10 +9,7 @@ import styled from "styled-components";
 import { getAuth, signInWithPopup, getAdditionalUserInfo } from "firebase/auth";
 import { addDoc, collection } from "firebase/firestore";
 
-import { useContext } from "react";
-
-import { provider, db } from "../../firebase";
-import {Context} from "../context/Context";
+import { useHistory } from "react-router-dom/cjs/react-router-dom";
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -27,7 +25,7 @@ const Container = styled.div`
   }
 `;
 function Login() {
-  const {history} = useContext(Context);
+  const history = useHistory();
   const auth = getAuth();
   const handleLogin = () => {
     signInWithPopup(auth, provider)

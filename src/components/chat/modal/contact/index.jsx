@@ -1,4 +1,11 @@
-import { UserAddOutlined, UserDeleteOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import { AppContext } from "@/context/AppContext";
+import { db } from "@/firebase.js";
+
+import {
+  UserAddOutlined,
+  UserDeleteOutlined,
+  CheckCircleOutlined,
+} from "@ant-design/icons";
 
 import { Avatar, Modal, Input, Button } from "antd";
 
@@ -14,14 +21,13 @@ import {
 } from "firebase/firestore";
 
 import { useContext, useEffect, useState } from "react";
-
-import { db } from "../../firebase";
-import { Context } from "../context/Context";
 function Contact() {
-  const { isContact, setIsContact, infoUser, addFriends } = useContext(Context);
+  const { isContact, setIsContact, infoUser } =
+    useContext(AppContext);
+    const [addFriends, setAddFriends] = useState([]);
   const handleCancel = () => {
     setIsContact(false);
-    setSearchQuery("")
+    setSearchQuery("");
   };
   const [users, setUsers] = useState([]);
   useEffect(() => {
@@ -41,7 +47,7 @@ function Contact() {
     const value = e.target.value;
     setSearchQuery(value);
     const exactMatch = users.filter(
-      (user) => user.email && user.email.toLowerCase() === value.toLowerCase()
+      (user) => user.email && user.email.toLowerCase() === value.toLowerCase(),
     );
     setFiltered(exactMatch);
   };
@@ -58,7 +64,7 @@ function Contact() {
     const q = query(
       collection(db, "friend_requests"),
       where("from", "==", infoUser.uid),
-      where("to", "==", userUid)
+      where("to", "==", userUid),
     );
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach(async (docSnapshot) => {
@@ -66,6 +72,20 @@ function Contact() {
       console.log("Friends request deleted", docSnapshot.id);
     });
   };
+  useEffect(() => {
+    const q = query(
+      collection(db, "friend_requests"),
+      where("from", "==", infoUser.uid)
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const friendsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setAddFriends(friendsData);
+    });
+    return () => unsubscribe();
+  }, [infoUser]);
   return (
     <>
       <Modal
@@ -88,7 +108,7 @@ function Contact() {
           ? filtered.map((user) => {
               const friendRequests = addFriends?.find(
                 (friend) =>
-                  friend.to === user.uid && friend.status === "pending"
+                  friend.to === user.uid && friend.status === "pending",
               );
               return (
                 <div key={user.uid}>
@@ -118,9 +138,19 @@ function Contact() {
                       </div>
                     </div>
                     {user.friends && user.friends.includes(infoUser.uid) ? (
-                      <div style={{background:"#3366FF", color:"#fff", borderRadius:"10px", padding:"10px", display: "flex"}}>
-                        <div style={{marginRight:"5px"}}>{<CheckCircleOutlined/>}</div>
-                        <div style={{marginLeft:"5px"}}>Bạn bè</div>
+                      <div
+                        style={{
+                          background: "#3366FF",
+                          color: "#fff",
+                          borderRadius: "10px",
+                          padding: "10px",
+                          display: "flex",
+                        }}
+                      >
+                        <div style={{ marginRight: "5px" }}>
+                          {<CheckCircleOutlined />}
+                        </div>
+                        <div style={{ marginLeft: "5px" }}>Bạn bè</div>
                       </div>
                     ) : friendRequests ? (
                       <Button

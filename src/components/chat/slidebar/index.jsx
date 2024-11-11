@@ -1,25 +1,26 @@
+import { AppContext } from "@/context/AppContext.jsx";
+
 import { Col, Row, Button, Avatar } from "antd";
 
-import { useContext, useState, useRef, useEffect} from "react";
+import { useContext, useState, useRef, useEffect } from "react";
 
-import Menu from "../menu/Menu.jsx";
-import { Context } from "../../context/Context.jsx";
+import Menu from "../menu/index.jsx";
 
-import AllRooms from "./AllRooms.jsx";
-import Friends from "./Friends.jsx";
-import Notification from "./Notification.jsx";
-import "./Slidebar.css";
+import "./index.css";
+
+import AllRooms from "./allrooms/index.jsx";
+import Friends from "./friends/index.jsx";
+import Notification from "./notification/index.jsx";
 
 function Slidebar() {
-  const { infoUser, activeTab, handleLogOut, } =
-    useContext(Context);
+  const { infoUser, activeTab, handleLogOut } = useContext(AppContext);
   const [isMenu, setIsMenu] = useState(false);
   const handleMenu = () => {
     setIsMenu((prev) => !prev);
   };
   const showRef = useRef(null);
   const buttonRef = useRef(null);
-   const handleClickOutside = (event) => {
+  const handleClickOutside = (event) => {
     if (
       showRef.current &&
       buttonRef.current &&
