@@ -1,7 +1,7 @@
-import { db } from "@/firebase.js";
+import { db } from "@/config/firebase.js";
 import { AppContext } from "@/context/AppContext";
 
-import { Avatar, Col } from "antd";
+import {  Col } from "antd";
 
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 
@@ -36,7 +36,7 @@ function Friends() {
                   onClick={() => handleShowChatFriend(friend)}
                 >
                   <div className="info_friends">
-                    <Avatar src={friend.photoURL}></Avatar>
+                    <img style={{width:"40px", height:"40px", borderRadius:"50%"}} src={friend.photoURL}/>
                     <div style={{ marginLeft: "10px" }}>
                       {friend.displayName}
                     </div>

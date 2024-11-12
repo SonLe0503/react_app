@@ -1,5 +1,5 @@
 import { AppContext } from "@/context/AppContext";
-import { db } from "@/firebase.js";
+import { db } from "@/config/firebase.js";
 
 import {
   UserAddOutlined,
@@ -22,32 +22,21 @@ import {
 
 import { useContext, useEffect, useState } from "react";
 function Contact() {
-  const { isContact, setIsContact, infoUser } =
-    useContext(AppContext);
-    const [addFriends, setAddFriends] = useState([]);
-  const handleCancel = () => {
-    setIsContact(false);
-    setSearchQuery("");
-  };
-  const [users, setUsers] = useState([]);
-  useEffect(() => {
-    const q = query(collection(db, "users"), where("uid", "!=", infoUser.uid));
-    const unsubscribe = onSnapshot(q, async (snapshot) => {
-      const usersData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setUsers(usersData);
-    });
-    return () => unsubscribe();
-  }, []);
+  const { isModalContact, setIsModalContact, infoUser } = useContext(AppContext);
+  const [addFriends, setAddFriends] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filtered, setFiltered] = useState([]);
+  const [users, setUsers] = useState([]);
+  const handleCancel = () => {
+    setIsModalContact(false);
+    setSearchQuery("");
+  };
+
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
     const exactMatch = users.filter(
-      (user) => user.email && user.email.toLowerCase() === value.toLowerCase(),
+      (user) => user.email && user.email.toLowerCase() === value.toLowerCase()
     );
     setFiltered(exactMatch);
   };
@@ -64,7 +53,7 @@ function Contact() {
     const q = query(
       collection(db, "friend_requests"),
       where("from", "==", infoUser.uid),
-      where("to", "==", userUid),
+      where("to", "==", userUid)
     );
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach(async (docSnapshot) => {
@@ -86,10 +75,21 @@ function Contact() {
     });
     return () => unsubscribe();
   }, [infoUser]);
+  useEffect(() => {
+    const q = query(collection(db, "users"), where("uid", "!=", infoUser.uid));
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      const usersData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setUsers(usersData);
+    });
+    return () => unsubscribe();
+  }, []);
   return (
     <>
       <Modal
-        open={isContact}
+        open={isModalContact}
         onCancel={handleCancel}
         footer={[
           <Button key="cancel" onClick={handleCancel}>
@@ -108,7 +108,7 @@ function Contact() {
           ? filtered.map((user) => {
               const friendRequests = addFriends?.find(
                 (friend) =>
-                  friend.to === user.uid && friend.status === "pending",
+                  friend.to === user.uid && friend.status === "pending"
               );
               return (
                 <div key={user.uid}>

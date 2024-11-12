@@ -1,4 +1,4 @@
-import { provider, db } from "@/firebase.js";
+import { provider, db } from "@/config/firebase.js";
 
 import { GoogleOutlined, FacebookOutlined } from "@ant-design/icons";
 

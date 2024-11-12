@@ -1,4 +1,4 @@
-import { db } from "@/firebase.js";
+import { db } from "@/config/firebase.js";
 import { AppContext } from "@/context/AppContext";
 
 import { Avatar, Button, Col } from "antd";
@@ -20,31 +20,18 @@ import { useContext, useEffect, useState } from "react";
 function Notification() {
   const { infoUser, usersData } = useContext(AppContext);
   const [friends, setFriends] = useState([]);
-  useEffect(() => {
-    const q = query(
-      collection(db, "friend_requests"),
-      where("to", "==", infoUser.uid),
-    );
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const friendsData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setFriends(friendsData);
-    });
-    return () => unsubscribe();
-  }, [infoUser]);
+
   const handleAccept = async (friendRequestId, fromUserId) => {
     const user1Query = query(
       collection(db, "users"),
-      where("uid", "==", fromUserId),
+      where("uid", "==", fromUserId)
     );
     const user1Snapshot = await getDocs(user1Query);
     const user1Doc = user1Snapshot.docs[0];
 
     const user2Query = query(
       collection(db, "users"),
-      where("uid", "==", infoUser.uid),
+      where("uid", "==", infoUser.uid)
     );
     const user2Snapshot = await getDocs(user2Query);
     const user2Doc = user2Snapshot.docs[0];
@@ -62,16 +49,30 @@ function Notification() {
     const friendRequestRef = doc(db, "friend_requests", friendRequestId);
     await deleteDoc(friendRequestRef);
     setFriends((prevFriends) =>
-      prevFriends.filter((friend) => friend.id !== friendRequestId),
+      prevFriends.filter((friend) => friend.id !== friendRequestId)
     );
   };
   const handleReject = async (friendRequestId) => {
     const friendRequestRef = doc(db, "friend_requests", friendRequestId);
     await deleteDoc(friendRequestRef);
     setFriends((prevFriends) =>
-      prevFriends.filter((friend) => friend.id !== friendRequestId),
+      prevFriends.filter((friend) => friend.id !== friendRequestId)
     );
   };
+  useEffect(() => {
+    const q = query(
+      collection(db, "friend_requests"),
+      where("to", "==", infoUser.uid)
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const friendsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setFriends(friendsData);
+    });
+    return () => unsubscribe();
+  }, [infoUser]);
   return (
     <>
       <Col span={24}>
@@ -80,7 +81,7 @@ function Notification() {
             {usersData.map((user) => {
               const friendRequests = friends?.find(
                 (friend) =>
-                  friend.from === user.uid && friend.status === "pending",
+                  friend.from === user.uid && friend.status === "pending"
               );
               return (
                 <div key={user.uid}>

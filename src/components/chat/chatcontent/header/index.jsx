@@ -2,16 +2,26 @@ import { AppContext } from "@/context/AppContext";
 
 import { UserAddOutlined } from "@ant-design/icons";
 
-import { useContext, useState } from "react";
+import { useContext } from "react";
 
 import { Button, Avatar } from "antd";
 function ChatHeader() {
-  const { selectedRoom, usersData, selectedFriend } =
-    useContext(AppContext);
-    const [isModalFriend, setIsModalFriend] = useState("");
-    const handleShowModalFriend = () => {
-      setIsModalFriend(!isModalFriend);
-    };
+  const {
+    selectedRoom,
+    usersData,
+    selectedFriend,
+    setIsModalFriend,
+    isModalFriend,
+    isUserInfo,
+    setIsUserInfo,
+    userState,
+  } = useContext(AppContext);
+  const handleShowModalFriend = () => {
+    setIsModalFriend(!isModalFriend);
+  };
+  const showUserInfo = () => {
+    setIsUserInfo(!isUserInfo);
+  };
   return (
     <>
       <div className="chat_header">
@@ -44,8 +54,18 @@ function ChatHeader() {
           <div className="header">
             <div className="header_info">
               <div className="header_avatar_name">
-                <Avatar src={selectedFriend.photoURL}></Avatar>
-                <div className="info_name2">{selectedFriend.displayName}</div>
+                <img style={{width:"40px", height:"40px", borderRadius:"50%"}}
+                  src={selectedFriend.photoURL}
+                  onClick={showUserInfo}
+                ></img>
+                <div>
+                  <div className="info_name2">{selectedFriend.displayName}</div>
+                  <div style={{color:"rgba(255,255,255,0.7)", marginLeft:"10px"}}>
+                    {userState[selectedFriend.uid] &&
+                      userState[selectedFriend.uid].state === "offline" &&
+                      userState[selectedFriend.uid].offlineDuration}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

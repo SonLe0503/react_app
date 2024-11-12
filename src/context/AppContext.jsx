@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 
-import { auth, db, database } from "@/firebase.js";
+import { auth, db, database } from "@/config/firebase.js";
 
 import { createContext } from "react";
 
@@ -35,15 +35,13 @@ export const AppProvider = ({ children }) => {
   });
   const [rooms, setRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState("");
-  const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
-  const [isModalVisible, setIsModalVisible] = useState("");
+  const [isModalAddRoom, setIsModalAddRoom] = useState("");
   const [usersData, setUsersData] = useState([]);
   const [selectedFriend, setSelectedFriend] = useState("");
 
   const [userState, setUserState] = useState("offline");
   const [activeTab, setActiveTab] = useState("menu_allrooms");
-  const [isContact, setIsContact] = useState(false);
-  const [isMenu, setIsMenu] = useState("");
+  const [isModalContact, setIsModalContact] = useState(false);
   const [message, setMessage] = useState([
     {
       id: "",
@@ -55,6 +53,12 @@ export const AppProvider = ({ children }) => {
       uid: "",
     },
   ]);
+  const [isModalFriend, setIsModalFriend] = useState("");
+
+  const [isUserInfo, setIsUserInfo] = useState("");
+  const closeUserInfo = () => {
+    setIsUserInfo(false);
+  };
   const handleShowChatFriend = (friend) => {
     setSelectedRoom("");
     if (friend && friend.uid) {
@@ -62,7 +66,7 @@ export const AppProvider = ({ children }) => {
     }
   };
   const handleShowModal = () => {
-    setIsModalVisible(!isModalVisible);
+    setIsModalAddRoom(!isModalAddRoom);
     setActiveTab("menu_addroom");
   };
   const handleLogOut = () => {
@@ -81,7 +85,7 @@ export const AppProvider = ({ children }) => {
     const connectedRef = ref(database, ".info/connected");
 
     onValue(connectedRef, (snapshot) => {
-      if (snapshot.val() === false) {
+      if (!snapshot.val()) {
         return;
       }
       onDisconnect(userStatusDatabaseRef).set({
@@ -104,19 +108,19 @@ export const AppProvider = ({ children }) => {
     const daysOffline = Math.floor(hoursOffline / 24);
 
     if (secondsOffline < 60) {
-      return ` - Last seen: a few seconds ago`;
+      return `  Last seen: a few seconds ago`;
     } else if (minutesOffline < 60) {
-      return ` - Last seen: ${minutesOffline} minutes ago`;
+      return `  Last seen: ${minutesOffline} minutes ago`;
     } else if (hoursOffline < 24) {
-      return ` - Last seen: ${hoursOffline} hours ago`;
+      return `  Last seen: ${hoursOffline} hours ago`;
     } else {
-      return ` - Last seen: ${daysOffline} days ago`;
+      return `  Last seen: ${daysOffline} days ago`;
     }
   };
 
   const handleShowContact = () => {
-    setIsContact(!isContact);
-    setActiveTab("menu_friends");
+    setIsModalContact(!isModalContact);
+    setActiveTab("menu_addFriend");
   };
   useEffect(() => {
     if (!infoUser || (!selectedRoom && !selectedFriend)) return;
@@ -229,7 +233,7 @@ export const AppProvider = ({ children }) => {
     });
   }, []);
   useEffect(() => {
-    if (currentUserId) {
+    if (infoUser.uid) {
       const result = onSnapshot(collection(db, "rooms"), async (snapshot) => {
         const roomsData = snapshot.docs
           .map((doc) => ({
@@ -237,7 +241,7 @@ export const AppProvider = ({ children }) => {
             ...doc.data(),
           }))
           .filter(
-            (room) => room.members && room.members.includes(currentUserId)
+            (room) => room.members && room.members.includes(infoUser.uid)
           );
         const memberUids = roomsData.flatMap((room) => room.members);
         const q = query(
@@ -260,7 +264,7 @@ export const AppProvider = ({ children }) => {
       });
       return () => result();
     }
-  }, [currentUserId, selectedRoom]);
+  }, [infoUser.uid, selectedRoom]);
   useEffect(() => {
     usersData.forEach((user) => {
       const userStatusRef = ref(database, `/status/${user.uid}`);
@@ -291,28 +295,27 @@ export const AppProvider = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
-        history,
         infoUser,
         rooms,
-        isModalVisible,
+        isModalAddRoom,
         selectedRoom,
         usersData,
         message,
         userState,
-        isMenu,
         activeTab,
-        currentUserId,
-        isContact,
+        isModalContact,
         selectedFriend,
-        setIsContact,
-        setInfoUser,
+        isModalFriend,
+        isUserInfo,
+        setIsUserInfo,
+        setIsModalFriend,
+        setIsModalContact,
         setSelectedRoom,
-        setIsModalVisible,
-        setUsersData,
+        setIsModalAddRoom,
         setMessage,
         setUserState,
-        setIsMenu,
         setActiveTab,
+        closeUserInfo,
         handleLogOut,
         handleShowMess,
         handleShowModal,

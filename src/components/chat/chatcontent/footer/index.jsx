@@ -1,5 +1,5 @@
 import { AppContext } from "@/context/AppContext";
-import { db } from "@/firebase.js";
+import { db } from "@/config/firebase.js";
 
 import { useContext, useState } from "react";
 

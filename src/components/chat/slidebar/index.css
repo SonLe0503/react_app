@@ -23,6 +23,11 @@
 .slidebar_content_element_header {
   border-bottom: 1px solid white;
 }
+.content_user{
+  display: flex;
+  margin-left: 20px;
+  align-items: center;
+}
 .content_userName {
   margin: 5px;
 }

@@ -1,4 +1,4 @@
-import { db } from "@/firebase.js";
+import { db } from "@/config/firebase.js";
 import { AppContext } from "@/context/AppContext";
 
 import { Modal, Button, Form, Input } from "antd";
@@ -13,7 +13,7 @@ import {
 
 import { useContext } from "react";
 function AddRoom() {
-  const { isModalVisible, setIsModalVisible, infoUser } =
+  const { isModalAddRoom, setIsModalAddRoom, infoUser } =
     useContext(AppContext);
   const [form] = Form.useForm();
   const onSubmit = () => {
@@ -22,7 +22,7 @@ function AddRoom() {
       .then((values) => {
         handleOk(values);
         form.resetFields();
-        setIsModalVisible(false);
+        setIsModalAddRoom(false);
       })
       .catch((info) => {
         console.log("Failed:", info);
@@ -43,12 +43,12 @@ function AddRoom() {
   };
   const handleCancel = () => {
     form.resetFields();
-    setIsModalVisible(false);
+    setIsModalAddRoom(false);
   };
   return (
     <div>
       <Modal
-        open={isModalVisible}
+        open={isModalAddRoom}
         title="Create Room"
         onCancel={handleCancel}
         footer={null}

@@ -6,7 +6,7 @@ import { isToday, format, isYesterday, isSameWeek } from "date-fns";
 
 import { Avatar } from "antd";
 function ChatMessage() {
-  const { message, currentUserId } = useContext(AppContext);
+  const { message, infoUser } = useContext(AppContext);
   const isImageUrl = (url) => {
     return (
       typeof url === "string" &&
@@ -45,7 +45,7 @@ function ChatMessage() {
                 key={msg.id}
                 style={{
                   alignItems:
-                    msg.uid === currentUserId ? "flex-end" : "flex-start",
+                    msg.uid === infoUser.uid ? "flex-end" : "flex-start",
                 }}
                 className="message"
               >
@@ -58,7 +58,7 @@ function ChatMessage() {
                 </div>
                 <div
                   style={{
-                    textAlign: msg.uid === currentUserId ? "right" : "left",
+                    textAlign: msg.uid === infoUser.uid ? "right" : "left",
                   }}
                   className="mess_text"
                 >
@@ -72,7 +72,7 @@ function ChatMessage() {
                     <span
                       style={{
                         background:
-                          msg.uid === currentUserId ? "#27A4F2" : "gray",
+                          msg.uid === infoUser.uid ? "#27A4F2" : "gray",
                       }}
                       className="text_display"
                     >

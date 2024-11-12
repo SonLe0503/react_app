@@ -1,0 +1,25 @@
+.user_content{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.img_user{
+  border-radius: 50%;
+  padding: 10px;
+  width: 25%;
+}
+.name_user{
+  font-size: 17px;
+  font-weight: bold;
+}
+.user_contact{
+  margin-top: 20px;
+  display: flex;
+  background-color: rgba(255,255,255,0.5);
+  padding: 15px;
+  border-radius: 10px;
+  color:red;
+}
+.delete_contact{
+  margin-left: 10px;
+}

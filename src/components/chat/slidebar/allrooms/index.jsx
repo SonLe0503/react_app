@@ -11,7 +11,7 @@ function AllRooms() {
     usersData,
     userState,
   } = useContext(AppContext);
-  const [isShowRoomFriend, setIsShowRoomFriend] = useState(true);
+  const [isShowRoomFriend, setIsShowRoomFriend] = useState(false);
   const handleShowRoomFriend = () => {
     setIsShowRoomFriend(true);
   };
@@ -76,10 +76,13 @@ function AllRooms() {
                           className="roomMembers_element"
                         ></div>
                         <span>
-                          {user.displayName}{" "}
-                          {userState[user.uid] &&
+                          <span>{user.displayName}</span>
+                          <span>{userState[user.uid] &&
                             userState[user.uid].state === "offline" &&
-                            userState[user.uid].offlineDuration}
+                            " - "} </span>
+                          <span>{userState[user.uid] &&
+                            userState[user.uid].state === "offline" &&
+                            userState[user.uid].offlineDuration}</span>
                         </span>
                       </div>
                     ))}

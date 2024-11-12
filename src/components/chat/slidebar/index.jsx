@@ -1,6 +1,6 @@
 import { AppContext } from "@/context/AppContext.jsx";
 
-import { Col, Row, Button, Avatar } from "antd";
+import { Col, Row, Button } from "antd";
 
 import { useContext, useState, useRef, useEffect } from "react";
 
@@ -8,7 +8,7 @@ import Menu from "../menu/index.jsx";
 
 import "./index.css";
 
-import AllRooms from "./allrooms/index.jsx";
+import AllRooms from "./allRooms/index.jsx";
 import Friends from "./friends/index.jsx";
 import Notification from "./notification/index.jsx";
 
@@ -52,28 +52,37 @@ function Slidebar() {
                     alignItems: "center",
                   }}
                 >
-                  <div
-                    className="slidebar_content_menu"
-                    style={{ position: "relative" }}
-                  >
-                    <img
-                      className="img_menu"
-                      src="image_menu.png"
-                      alt="Menu"
-                      onClick={handleMenu}
-                      ref={buttonRef}
-                    />
-                    {isMenu && (
-                      <div ref={showRef}>
-                        <Menu />
-                      </div>
-                    )}
-                  </div>
-                  <div className="content_user">
-                    <Avatar src={infoUser.photoURL}></Avatar>
-                    <span className="content_userName">
-                      {infoUser.displayName}
-                    </span>
+                  <div style={{display:"flex"}}>
+                    <div
+                      className="slidebar_content_menu"
+                      style={{ position: "relative" }}
+                    >
+                      <img
+                        className="img_menu"
+                        src="image_menu.png"
+                        alt="Menu"
+                        onClick={handleMenu}
+                        ref={buttonRef}
+                      />
+                      {isMenu && (
+                        <div ref={showRef}>
+                          <Menu setIsMenu={setIsMenu} />
+                        </div>
+                      )}
+                    </div>
+                    <div className="content_user">
+                      <img
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          borderRadius: "50%",
+                        }}
+                        src={infoUser.photoURL}
+                      />
+                      <span className="content_userName">
+                        {infoUser.displayName}
+                      </span>
+                    </div>
                   </div>
                   <Button className="btn_Logout">
                     <span onClick={handleLogOut}>Logout</span>

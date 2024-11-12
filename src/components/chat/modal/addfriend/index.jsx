@@ -1,4 +1,4 @@
-import { db } from "@/firebase.js";
+import { db } from "@/config/firebase.js";
 import { AppContext } from "@/context/AppContext";
 
 import { Modal, Avatar, Select } from "antd";
@@ -16,6 +16,9 @@ import { useContext, useEffect, useState } from "react";
 function AddFriend() {
   const { isModalFriend, setIsModalFriend, selectedRoom } =
     useContext(AppContext);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [users, setUsers] = useState([]);
   const handleCancel = () => {
     setIsModalFriend(!isModalFriend);
     setSearchQuery("");
@@ -31,12 +34,17 @@ function AddFriend() {
     }
     handleCancel();
   };
-  const [users, setUsers] = useState([]);
+  const filtered = users.filter((user) =>
+    user.displayName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+  };
   useEffect(() => {
     if (selectedRoom) {
       const q = query(
         collection(db, "users"),
-        where("uid", "not-in", selectedRoom.members),
+        where("uid", "not-in", selectedRoom.members)
       );
       const result = onSnapshot(q, async (snapshot) => {
         const usersData = snapshot.docs.map((doc) => ({
@@ -48,14 +56,6 @@ function AddFriend() {
       return () => result();
     }
   }, [selectedRoom]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const filtered = users.filter((user) =>
-    user.displayName.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-  const [selectedUsers, setSelectedUsers] = useState([]);
-  const handleSearch = (value) => {
-    setSearchQuery(value);
-  };
   return (
     <div>
       <Modal
