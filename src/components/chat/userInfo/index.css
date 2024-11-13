@@ -5,8 +5,30 @@
 }
 .img_user{
   border-radius: 50%;
-  padding: 10px;
   width: 25%;
+  border: 4px solid white;
+  transition: border-color 0.3s;
+}
+@keyframes pulseGreen {
+  0% {
+    border-color: lightgreen;
+    box-shadow: 0 0 5px lightgreen;
+  }
+  50% {
+    border-color: green;
+    box-shadow: 0 0 10px green;
+  }
+  100% {
+    border-color: lightgreen;
+    box-shadow: 0 0 5px lightgreen;
+  }
+}
+.img_user.offline {
+  border-color: white;
+}
+.img_user.online {
+  border-color: green;
+  animation: pulseGreen 1.5s infinite;
 }
 .name_user{
   font-size: 17px;

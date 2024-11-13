@@ -54,13 +54,24 @@ function ChatHeader() {
           <div className="header">
             <div className="header_info">
               <div className="header_avatar_name">
-                <img style={{width:"40px", height:"40px", borderRadius:"50%"}}
+                <img
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "50%",
+                    border: `2px solid ${userState[selectedFriend.uid]?.state === "online" ? "green" : "white"}`,
+                  }}
                   src={selectedFriend.photoURL}
                   onClick={showUserInfo}
                 ></img>
                 <div>
                   <div className="info_name2">{selectedFriend.displayName}</div>
-                  <div style={{color:"rgba(255,255,255,0.7)", marginLeft:"10px"}}>
+                  <div
+                    style={{
+                      color: "rgba(255,255,255,0.7)",
+                      marginLeft: "10px",
+                    }}
+                  >
                     {userState[selectedFriend.uid] &&
                       userState[selectedFriend.uid].state === "offline" &&
                       userState[selectedFriend.uid].offlineDuration}

@@ -71,7 +71,7 @@ function UserInfo() {
         headerStyle={{ borderBottom: "1px solid white" }}
       >
         <div className="user_content">
-          <img className="img_user " src={selectedFriend.photoURL}></img>
+          <img className={`img_user ${userState[selectedFriend.uid]?.state === "online" ? "online" : "offline"}`} src={selectedFriend.photoURL}></img>
           <div className="name_user">{selectedFriend.displayName}</div>
           <div style={{color:"rgba(255,255,255,0.7)"}}>{userState[selectedFriend.uid] &&
             userState[selectedFriend.uid].state === "offline" &&
